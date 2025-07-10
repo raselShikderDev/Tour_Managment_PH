@@ -1,36 +1,34 @@
-import { Request, Response } from "express";
-import { userModel } from "./user.model";
+import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
+import { userServices } from "./user.services";
+import appError from "../../errorHelper/appError";
 
-const createUser = async (req: Request, res: Response) => {
+const createUser = async (req: Request, res: Response, next:NextFunction) => {
   try {
-    const { email, name } = req.body;
+    throw new appError(StatusCodes.BAD_REQUEST, "Fake Error by appError");
+    
+    const newUser = await userServices.createUser(req.body)
 
-    const user = userModel.create({
-      name,
-      email,
-    });
-
-    // if (Object.keys(user).length === 0) {
-    //   res.status(StatusCodes.).json({
-    //     success: false,
-    //     message: "User created",
-    //     user,
-    //   });
-    // }
+    if (Object.keys(newUser).length === 0) {
+      res.status(StatusCodes.BAD_GATEWAY).json({
+        success: false,
+        message: "Faild to create User",
+      });
+    }
 
     res.status(StatusCodes.CREATED).json({
       success: true,
       message: "User created",
-      user,
+      newUser,
     });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    res.status(StatusCodes.BAD_REQUEST).json({
-      success: false,
-      message: `User creataion faild: ${error.message}`,
-      error,
-    });
+    // res.status(StatusCodes.BAD_REQUEST).json({
+    //   success: false,
+    //   message: `User creataion faild: ${error.message}`,
+    //   error,
+    // });
+    next(error)
   }
 };
 
