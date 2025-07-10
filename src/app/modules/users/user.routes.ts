@@ -4,6 +4,7 @@ import { userCcontroller } from "./user.controller";
 const router = Router()
 
 
+router.get("/", userCcontroller.getAllUsers)
 router.post("/register", userCcontroller.createUser)
 
 
