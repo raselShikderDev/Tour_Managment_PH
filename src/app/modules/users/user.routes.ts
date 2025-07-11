@@ -1,11 +1,47 @@
-import { Router } from "express";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Router, Response, Request, NextFunction } from "express";
 import { userCcontroller } from "./user.controller";
+import z from "zod";
 
-const router = Router()
+const router = Router();
 
+router.get("/", userCcontroller.getAllUsers);
+router.post(
+  "/register",
+  async (req: Request, res: Response,  next: NextFunction) => {
+    const createZodValidation = z.object({
+      name: z
+        .string({ invalid_type_error: "name must be a string" })
+        .min(3, { message: "name must be at least three character" })
+        .max(50, { message: "name should contain maximum 50 chacacter" }),
+      email: z
+        .string({ invalid_type_error: "Invalid email address formate" })
+        .min(5, { message: "email should be at least 5 character" })
+        .max(50, { message: "email should contain maximum 50 chacacter" })
+        .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/),
+      password: z
+        .string({ invalid_type_error: "Invalid password type" })
+        .regex(
+          /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}:;<>,.?~\\/-]).{8,}$/,
+          "Password must be at least 8 characters long, include one uppercase letter, one number, and one special character"
+        ),
+      phone: z
+        .string({ invalid_type_error: "Invalid phone type" })
+        .regex(
+          /^(?:\+880|880|0)1[3-9]\d{8}$/,
+          "Invalid Bangladeshi phone number format"
+        )
+        .optional(),
+      address: z
+        .string({ invalid_type_error: "Invalid address type" })
+        .max(200, { message: "Addres must no more than 200 character" })
+        .optional(),
+    });
+    req.body = await createZodValidation.parseAsync(req.body);
+        console.log(req.body);
+        
+  },
+  userCcontroller.createUser
+);
 
-router.get("/", userCcontroller.getAllUsers)
-router.post("/register", userCcontroller.createUser)
-
-
-export const userRoutes = router 
+export const userRoutes = router;
