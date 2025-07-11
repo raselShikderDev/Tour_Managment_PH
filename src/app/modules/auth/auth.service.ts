@@ -24,6 +24,8 @@ const credentialsLogin = async (payload:Partial<IUser>) =>{
 
     return {
         email: existedUser.email,
+        role:existedUser.role,
+        jwtPayload,
         accessToken,
     }  
 }

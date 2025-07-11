@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express";
 import { AnyZodObject } from "zod";
 
@@ -6,5 +5,6 @@ export const validateRequest = (zodSchema:AnyZodObject)=> async (req: Request, r
     
     req.body = await zodSchema.parseAsync(req.body);
         // eslint-disable-next-line no-console
-        console.log(req.body);
+        console.log("ValidateRequest - User validated via Zod", req.body);
+        next()
   }

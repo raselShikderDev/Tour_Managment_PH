@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
@@ -19,7 +20,7 @@ const getAllUsers = catchAsync(
 
     // Sending success Response using custom response
     sendResponse(res, {
-      statusCode: StatusCodes.CREATED,
+      statusCode: StatusCodes.OK,
       success: true,
       message: "All users retrived successfully",
       data: result.data,
@@ -33,6 +34,7 @@ const getAllUsers = catchAsync(
 // Creating a user using custom async handleer - Which decrese using tryCatch repeatedly
 const createUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
+    console.log("Controller - Got request for create a user ");
     const newUser = await userServices.createUser(req.body);
 
     // if (Object.keys(newUser).length === 0) {
@@ -88,7 +90,25 @@ const createUser = catchAsync(
 //   }
 // };
 
+const updateUser = catchAsync(async( req: Request, res: Response, next: NextFunction)=>{
+  console.log("Controller - Got request for updating user");
+  
+  const userEmail = req.params.email
+    console.log("Controller - userEmail: ", userEmail);
+    console.log("Controller - req.body : ", req.body);
+
+  const updatedUserInfo = await userServices.updateUser(userEmail as string, req.body)
+  sendResponse(res, {
+      statusCode:StatusCodes.OK,
+      success:true,
+      message:"User updated successfully",
+      data:updatedUserInfo,
+    })
+})
+
+
 export const userCcontroller = {
   createUser,
   getAllUsers,
+  updateUser,
 };
