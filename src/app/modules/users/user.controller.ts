@@ -4,12 +4,12 @@ import { StatusCodes } from "http-status-codes";
 import { userServices } from "./user.services";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
-// import appError from "../../errorHelper/appError";
 
 // Getting all user using custom async handleer - Which decrese using tryCatch repeatedly
 const getAllUsers = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const result = await userServices.getAllUser();
+
 
     // res.status(StatusCodes.CREATED).json({
     //   success: true,
@@ -17,6 +17,7 @@ const getAllUsers = catchAsync(
     //   allUser,
     // });
 
+    // Sending success Response using custom response
     sendResponse(res, {
       statusCode: StatusCodes.CREATED,
       success: true,
@@ -47,6 +48,7 @@ const createUser = catchAsync(
     //   newUser,
     // });
 
+    // Sending success Response using custom response
     sendResponse(res, {
       statusCode:StatusCodes.CREATED,
       success:true,
@@ -56,6 +58,7 @@ const createUser = catchAsync(
   }
 );
 
+// // Creating controller in a traditional way with usign again and again try catch
 // const createUser = async (req: Request, res: Response, next:NextFunction) => {
 //   try {
 //     // throw new appError(StatusCodes.BAD_REQUEST, "Fake Error by appError");
