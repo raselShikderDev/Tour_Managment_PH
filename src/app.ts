@@ -2,7 +2,6 @@ import express, { Application, Request, Response } from "express";
 import cors from "cors"
 import { router } from "./app/routes";
 import { globalError } from "./app/middleware/globalError";
-import { StatusCodes } from "http-status-codes";
 import notFound from "./app/middleware/notFound";
 
 const app:Application = express()
