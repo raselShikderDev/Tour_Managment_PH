@@ -1,9 +1,10 @@
-/* eslint-disable no-console */
 import { StatusCodes } from "http-status-codes";
 import appError from "../../errorHelper/appError";
-import { IAuthProvider, IUser } from "./user.interface";
+import { IAuthProvider, IUser, role } from "./user.interface";
 import { userModel } from "./user.model";
 import bcrypt from "bcrypt";
+import { envVars } from "../../config/env";
+import { JwtPayload } from "jsonwebtoken";
 
 const createUser = async (payload: Partial<IUser>) => {
   const { email, password, ...rest } = payload;
@@ -12,7 +13,10 @@ const createUser = async (payload: Partial<IUser>) => {
   if (existsUser)
     throw new appError(StatusCodes.BAD_REQUEST, "User already exists");
 
-  const hashedPasswrd = await bcrypt.hash(password as string, 10);
+  const hashedPasswrd = await bcrypt.hash(
+    password as string,
+    Number(envVars.BCRYPT_SALT_ROUND)
+  );
 
   const authProvider: IAuthProvider = {
     provider: "Credentials",
@@ -39,20 +43,43 @@ const getAllUser = async () => {
 };
 
 const updateUser = async (
-  userEmail:string,
-  payload: Partial<IUser>
+  userId: string,
+  payload: Partial<IUser>,
+  decodedToken: JwtPayload
 ) => {
-      console.log("services - userEmail: ", userEmail);
-      console.log("services - payload: ", payload);
+  const userExist = await userModel.findById(userId);
+  if (!userExist) throw new appError(StatusCodes.NOT_FOUND, "User not found");
 
-  const updateUser = await userModel.findOneAndUpdate(
-    {userEmail},
-    { $set: payload },
-    { new: true }
-  );
-  console.log("services - UpdatedUser: ", updateUser);
-  
-  if (!updateUser) throw new appError(StatusCodes.NOT_FOUND, "user not exists");
+// if user want to change role
+  if (payload.role) {
+    // If user not admin or super admin
+    if (decodedToken.role === role.USER || decodedToken.role === role.GUIDE) {
+      throw new appError(StatusCodes.FORBIDDEN, "You are not authorized");
+    }
+
+    // if user admin but want to promote to super admin - (ONly super admin can promote to super admin)
+    if (payload.role === role.SUPER_ADMIN || decodedToken.role === role.ADMIN) {
+      throw new appError(StatusCodes.FORBIDDEN, "You are not authorized");
+    }
+  }
+
+  if (payload.isActive || payload.isVerified || payload.isDeleted) {
+    if (decodedToken.role === role.USER || decodedToken.role === role.GUIDE) {
+      throw new appError(StatusCodes.FORBIDDEN, "You are not authorized");
+    }
+  }
+
+  if (payload.password) {
+    payload.password = await bcrypt.hash(
+      payload.password,
+      Number(envVars.BCRYPT_SALT_ROUND)
+    );
+  }
+
+  const updateUser = await userModel.findByIdAndUpdate(userId, payload, {
+    new: true,
+    runValidators: true,
+  });
   return updateUser;
 };
 

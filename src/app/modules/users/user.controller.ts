@@ -5,6 +5,9 @@ import { StatusCodes } from "http-status-codes";
 import { userServices } from "./user.services";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
+import { verifyJwtToken } from "../../utils/jwt";
+import { envVars } from "../../config/env";
+import { JwtPayload } from "jsonwebtoken";
 
 // Getting all user using custom async handleer - Which decrese using tryCatch repeatedly
 const getAllUsers = catchAsync(
@@ -93,11 +96,13 @@ const createUser = catchAsync(
 const updateUser = catchAsync(async( req: Request, res: Response, next: NextFunction)=>{
   console.log("Controller - Got request for updating user");
   
-  const userEmail = req.params.email
-    console.log("Controller - userEmail: ", userEmail);
-    console.log("Controller - req.body : ", req.body);
-
-  const updatedUserInfo = await userServices.updateUser(userEmail as string, req.body)
+  const userId = req.params.userId
+  const payload = req.body
+  // const token = req.headers.authorization
+  // const verifiedToken = verifyJwtToken(token as string, envVars.JWT_ACCESS_SECRET as string) as JwtPayload
+  // setting token in request by decalring a type for request that getting from express
+  const verifiedToken = req.user
+  const updatedUserInfo = await userServices.updateUser(userId, payload, verifiedToken)
   sendResponse(res, {
       statusCode:StatusCodes.OK,
       success:true,
