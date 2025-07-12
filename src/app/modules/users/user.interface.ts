@@ -30,12 +30,12 @@ export interface IUser{
     email:string;
     password?:string;
     role:role;
-    phone:string;
+    phone?:string;
     picture?:string;
     address?:string;
     isDeleted?:boolean;
     isActive?:isActive;
-    isVerified?:string;
+    isVerified?:boolean;
     auths:IAuthProvider[];
     bookings?:Types.ObjectId[];
     guide?:Types.ObjectId[];

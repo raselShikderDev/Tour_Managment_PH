@@ -7,10 +7,15 @@ interface IEnvVars {
   MONGO_URI: string;
   PORT: string; // In video it defined as string in the last video of module 25
   NODE_ENV: "Development" | "Production";
+  JWT_ACCESS_EXPIRES:string;
+  JWT_ACCESS_SECRET:string;
+  BCRYPT_SALT_ROUND:string;
+  SUPER_ADMIN_PASSWORD:string;
+  SUPER_ADMIN_EMAIL:string;
 }
 
 const loadEnvVariables = () => {
-    const requiredEnv:string[] = ["MONGO_URI", "PORT", "NODE_ENV"]
+    const requiredEnv:string[] = ["MONGO_URI", "PORT", "NODE_ENV", "JWT_ACCESS_EXPIRES", "JWT_ACCESS_SECRET", "BCRYPT_SALT_ROUND", "SUPER_ADMIN_PASSWORD","SUPER_ADMIN_EMAIL"]
     requiredEnv.forEach((elem)=>{
         if (!process.env[elem]) {
             throw new Error(`Missing envoirnment varriabls ${elem}`);
@@ -20,6 +25,11 @@ const loadEnvVariables = () => {
     MONGO_URI: process.env.MONGO_URI as string,
     PORT: process.env.PORT as string,
     NODE_ENV: process.env.NODE_ENV as "Development" | "Production",
+    JWT_ACCESS_EXPIRES:process.env.JWT_ACCESS_EXPIRES,
+    JWT_ACCESS_SECRET:process.env.JWT_ACCESS_SECRET,
+    BCRYPT_SALT_ROUND:process.env.BCRYPT_SALT_ROUND,
+    SUPER_ADMIN_EMAIL:process.env.SUPER_ADMIN_EMAIL,
+    SUPER_ADMIN_PASSWORD:process.env.SUPER_ADMIN_PASSWORD,
   };
 };
 
