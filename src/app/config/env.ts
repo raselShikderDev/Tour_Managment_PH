@@ -12,10 +12,12 @@ interface IEnvVars {
   BCRYPT_SALT_ROUND:string;
   SUPER_ADMIN_PASSWORD:string;
   SUPER_ADMIN_EMAIL:string;
+  JWT_REFRESH_SECRET:string;
+  JWT_REFRESH_EXPIRES:string;
 }
 
 const loadEnvVariables = () => {
-    const requiredEnv:string[] = ["MONGO_URI", "PORT", "NODE_ENV", "JWT_ACCESS_EXPIRES", "JWT_ACCESS_SECRET", "BCRYPT_SALT_ROUND", "SUPER_ADMIN_PASSWORD","SUPER_ADMIN_EMAIL"]
+    const requiredEnv:string[] = ["MONGO_URI", "PORT", "NODE_ENV", "JWT_ACCESS_EXPIRES", "JWT_ACCESS_SECRET", "BCRYPT_SALT_ROUND", "SUPER_ADMIN_PASSWORD","SUPER_ADMIN_EMAIL", "JWT_REFRESH_SECRET", "JWT_REFRESH_EXPIRES"]
     requiredEnv.forEach((elem)=>{
         if (!process.env[elem]) {
             throw new Error(`Missing envoirnment varriabls ${elem}`);
@@ -30,6 +32,8 @@ const loadEnvVariables = () => {
     BCRYPT_SALT_ROUND:process.env.BCRYPT_SALT_ROUND,
     SUPER_ADMIN_EMAIL:process.env.SUPER_ADMIN_EMAIL,
     SUPER_ADMIN_PASSWORD:process.env.SUPER_ADMIN_PASSWORD,
+    JWT_REFRESH_SECRET:process.env.JWT_REFRESH_SECRET,
+    JWT_REFRESH_EXPIRES:process.env.JWT_REFRESH_EXPIRES,
   };
 };
 
