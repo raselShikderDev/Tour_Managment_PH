@@ -10,10 +10,9 @@ export const seedSuperAdmin = async () => {
     const superAdminExist = await userModel.findOne({
       email: envVars.SUPER_ADMIN_EMAIL,
     });
-    console.log(`Superadmin existed: ${superAdminExist}`);
     
     if (superAdminExist) {
-      console.log("Super Admin exist");
+      // console.log(`Superadmin existed: ${superAdminExist}`);
       return;
     }
     console.log("Creating super admin");
