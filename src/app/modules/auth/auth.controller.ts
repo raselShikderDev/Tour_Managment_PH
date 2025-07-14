@@ -98,13 +98,17 @@ const resetPassword = catchAsync(
 
 // Handling google authentiction "/Google/callback" route
 const googleCallback = catchAsync(async (req: Request, res: Response, next: NextFunction)=>{
+ let redirect = req.query.state as string
+ if (redirect.startsWith("/")) {
+  redirect = redirect.slice(1)
+ }
   const user = req.user
   if (!user) {
     throw new appError(StatusCodes.NOT_FOUND, "User not found")
   }
   const userTokens = await createUserToken(user)
   await setAuthCookie(res, userTokens)
-  res.redirect(envVars.FRONEND_URL as string)
+  res.redirect(`${envVars.FRONEND_URL as string}/${redirect}`)
 })
 
 export const authController = {

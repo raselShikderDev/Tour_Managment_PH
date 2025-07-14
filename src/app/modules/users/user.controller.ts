@@ -116,7 +116,7 @@ const updateUser = catchAsync(async( req: Request, res: Response, next: NextFunc
   // const verifiedToken = verifyJwtToken(token as string, envVars.JWT_ACCESS_SECRET as string) as JwtPayload
   // setting token in request by decalring a type for request that getting from express
   const verifiedToken = req.user
-  const updatedUserInfo = await userServices.updateUser(userId, payload, verifiedToken)
+  const updatedUserInfo = await userServices.updateUser(userId, payload, verifiedToken as JwtPayload) 
   sendResponse(res, {
       statusCode:StatusCodes.OK,
       success:true,
