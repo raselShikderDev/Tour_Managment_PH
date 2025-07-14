@@ -93,6 +93,23 @@ const createUser = catchAsync(
 //   }
 // };
 
+/**
+ * Deleting user
+ */
+const deleteUser = catchAsync(async( req: Request, res: Response, next: NextFunction)=>{
+  const userId = req.params.userId
+
+  const deletedUser = await userServices.deleteuser(userId)
+
+  sendResponse(res, {
+      statusCode:StatusCodes.OK,
+      success:true,
+      message:"User deleted successfully",
+      data:deletedUser,
+    })
+})
+
+// Updating user info
 const updateUser = catchAsync(async( req: Request, res: Response, next: NextFunction)=>{
   console.log("Controller - Got request for updating user");
   
@@ -112,8 +129,11 @@ const updateUser = catchAsync(async( req: Request, res: Response, next: NextFunc
 })
 
 
+
+
 export const userCcontroller = {
   createUser,
   getAllUsers,
   updateUser,
+  deleteUser,
 };

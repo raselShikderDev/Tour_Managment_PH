@@ -1,9 +1,12 @@
+/* eslint-disable no-console */
 import { NextFunction, Request, Response } from "express";
 import appError from "../errorHelper/appError";
 import { StatusCodes } from "http-status-codes";
 import { verifyJwtToken } from "../utils/jwt";
 import { JwtPayload } from "jsonwebtoken";
 import { envVars } from "../config/env";
+import { userModel } from "../modules/users/user.model";
+import { isActive } from "../modules/users/user.interface";
 
 export const checkAuth =
   (...authRoles: string[]) =>
@@ -17,10 +20,30 @@ export const checkAuth =
       //   accessToken,
       //   "OwnSecretSignatureForJWT"
       // ) as JwtPayload;
-      const verifiedToekn = verifyJwtToken(
+      const verifiedToekn = await verifyJwtToken(
         accessToken,
         envVars.JWT_ACCESS_SECRET as string
       ) as JwtPayload;
+      console.log(`checkAuth - VerifiedToken: ${verifiedToekn}`)
+      const userExist = await userModel.findOne({ email: verifiedToekn.email });
+      if (!userExist)
+        throw new appError(StatusCodes.NOT_FOUND, "User not found");
+
+      if (userExist.isDeleted === true) {
+        throw new appError(StatusCodes.BAD_REQUEST, `User is deleted already`);
+      }
+
+      if (
+        userExist.isActive === isActive.INACTIVE ||
+        userExist.isActive === isActive.BLOCKED
+      ) {
+        throw new appError(
+          StatusCodes.BAD_REQUEST,
+          `User is ${userExist.isActive}`
+        );
+      }
+
+      req.user = verifiedToekn;
       if (!verifiedToekn)
         throw new appError(StatusCodes.UNAUTHORIZED, "Token is not valid");
 

@@ -5,6 +5,6 @@ export const validateRequest = (zodSchema:AnyZodObject)=> async (req: Request, r
     
     req.body = await zodSchema.parseAsync(req.body);
         // eslint-disable-next-line no-console
-        console.log("ValidateRequest - User validated via Zod", req.body);
+        console.log("ValidateRequest - User's provided data validated via Zod", req.body);
         next()
   }

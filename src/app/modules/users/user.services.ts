@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { StatusCodes } from "http-status-codes";
 import appError from "../../errorHelper/appError";
 import { IAuthProvider, IUser, role } from "./user.interface";
@@ -8,7 +9,8 @@ import { JwtPayload } from "jsonwebtoken";
 
 const createUser = async (payload: Partial<IUser>) => {
   const { email, password, ...rest } = payload;
-
+  console.log(`User creatd with password: ${password}`);
+  
   const existsUser = await userModel.findOne({ email });
   if (existsUser)
     throw new appError(StatusCodes.BAD_REQUEST, "User already exists");
@@ -17,6 +19,8 @@ const createUser = async (payload: Partial<IUser>) => {
     password as string,
     Number(envVars.BCRYPT_SALT_ROUND)
   );
+  console.log(`User creatd at database with hashed password: ${hashedPasswrd}`);
+
 
   const authProvider: IAuthProvider = {
     provider: "Credentials",
@@ -83,8 +87,14 @@ const updateUser = async (
   return updateUser;
 };
 
+const deleteuser = async (userid:string)=>{
+  const deletedUser = await userModel.findByIdAndDelete(userid)
+  return deletedUser
+}
+
 export const userServices = {
   createUser,
   getAllUser,
   updateUser,
+  deleteuser,
 };
