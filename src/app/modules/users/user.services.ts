@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { StatusCodes } from "http-status-codes";
 import appError from "../../errorHelper/appError";
 import { IAuthProvider, IUser, role } from "./user.interface";
@@ -9,7 +8,6 @@ import { JwtPayload } from "jsonwebtoken";
 
 const createUser = async (payload: Partial<IUser>) => {
   const { email, password, ...rest } = payload;
-  console.log(`User creatd with password: ${password}`);
   
   const existsUser = await userModel.findOne({ email });
   if (existsUser)
@@ -19,8 +17,6 @@ const createUser = async (payload: Partial<IUser>) => {
     password as string,
     Number(envVars.BCRYPT_SALT_ROUND)
   );
-  console.log(`User creatd at database with hashed password: ${hashedPasswrd}`);
-
 
   const authProvider: IAuthProvider = {
     provider: "Credentials",

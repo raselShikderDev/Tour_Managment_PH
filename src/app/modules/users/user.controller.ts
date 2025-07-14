@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
@@ -37,7 +36,6 @@ const getAllUsers = catchAsync(
 // Creating a user using custom async handleer - Which decrese using tryCatch repeatedly
 const createUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log("Controller - Got request for create a user ");
     const newUser = await userServices.createUser(req.body);
 
     // if (Object.keys(newUser).length === 0) {
@@ -111,7 +109,6 @@ const deleteUser = catchAsync(async( req: Request, res: Response, next: NextFunc
 
 // Updating user info
 const updateUser = catchAsync(async( req: Request, res: Response, next: NextFunction)=>{
-  console.log("Controller - Got request for updating user");
   
   const userId = req.params.userId
   const payload = req.body
