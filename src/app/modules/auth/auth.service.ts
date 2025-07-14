@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { StatusCodes } from "http-status-codes";
 import appError from "../../errorHelper/appError";
 import { IUser } from "../users/user.interface";
@@ -12,7 +11,6 @@ import { envVars } from "../../config/env";
 // checking credential login info and creating user tokens
 const credentialsLogin = async (payload: Partial<IUser>) => {
   const { email, password } = payload;
-console.log(`requested user password for login: ${password}`);
 
   const existedUser = await userModel.findOne({ email });
 
@@ -95,7 +93,6 @@ const resetPassword = async (
   oldPassword: string,
   decodedToken: JwtPayload
 ) => {
-  console.log("oldpassword: ", oldPassword);
 
   const user = await userModel.findById(decodedToken.userId);
   if (!user) {
