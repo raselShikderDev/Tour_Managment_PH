@@ -5,19 +5,72 @@ import catchAsync from "../../utils/catchAsync";
 import { authServices } from "./auth.service";
 import sendResponse from "../../utils/sendResponse";
 import { StatusCodes } from "http-status-codes";
+import { setAuthCookie } from "../../utils/setCookie";
 
+// Login by credentials and giving a access token to user API
 const credentialsLogin = catchAsync(async(req:Request, res:Response, next:NextFunction)=>{
-   const loginInfo = await authServices.credentialsLogin(req.body)
-   console.log(loginInfo);
+   const loggedinInfo = await authServices.credentialsLogin(req.body)
+   
+//    // Setting access Token and refresh token tradional way
+//     res.cookie("refreshToken", loggedinInfo.refreshToken, {
+//         httpOnly:true,
+//         secure:false
+//     })
+//     res.cookie("accessToken", loggedinInfo.accessToken, {
+//         httpOnly:true,
+//         secure:false
+//     })
+
+    // Setting access Token and refresh token with a utils function
+     setAuthCookie(res, loggedinInfo)
+
    sendResponse(res, {
       statusCode:StatusCodes.OK,
       success:true,
       message:"User logged in successfully",
-      data:loginInfo,
+      data:loggedinInfo,
+    })
+})
+
+// Generating new access token by refresh token API
+const getNewAccessToken = catchAsync(async(req:Request, res:Response, next:NextFunction)=>{
+    const refreshToen = req.cookies.refreshToken
+   const newAccessToen = await authServices.newAccessToken(refreshToen as string)
+        setAuthCookie(res, newAccessToen)
+
+   console.log("New refrsh token", newAccessToen.accessToken);
+   sendResponse(res, {
+      statusCode:StatusCodes.OK,
+      success:true,
+      message:"New access token retrived successfully",
+      data:newAccessToen.accessToken,
+    })
+})
+
+// Logout user by deleting accessToken and refreshToken from cookies
+const logoutUser = catchAsync(async(req:Request, res:Response, next:NextFunction)=>{
+    res.clearCookie("accessToken", {
+        httpOnly:true,
+        secure:false,
+        sameSite:"lax",
+    })
+
+    res.clearCookie("refreshToken", {
+        httpOnly:true,
+        secure:false,
+        sameSite:"lax",
+    })
+   sendResponse(res, {
+      statusCode:StatusCodes.OK,
+      success:true,
+      message:"User successfully logout",
+      data:null,
     })
 })
 
 export const authController ={
-    credentialsLogin
+    credentialsLogin,
+    getNewAccessToken,
+    logoutUser,
 }
 

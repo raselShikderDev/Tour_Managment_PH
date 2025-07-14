@@ -6,8 +6,8 @@ export const GenerateAccessToken = async (jwtPayload:JwtPayload, secret:string, 
         return accessToken
 }
 
-export const verifyJwtToken = (accessToken:string, secret:string)=>{
-     const verifiedToekn = jwt.verify(accessToken, secret);
+export const verifyJwtToken = async (accessToken:string, secret:string)=>{
+     const verifiedToekn = await jwt.verify(accessToken, secret);
      return verifiedToekn
 }
 

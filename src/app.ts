@@ -3,9 +3,11 @@ import cors from "cors"
 import { router } from "./app/routes";
 import { globalError } from "./app/middleware/globalError";
 import notFound from "./app/middleware/notFound";
+import cookieParser from "cookie-parser";
 
 const app:Application = express()
 
+app.use(cookieParser())
 app.use(cors())
 app.use(express.json())
 
