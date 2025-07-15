@@ -129,3 +129,4 @@ export const globalError = (
     stack: envVars.NODE_ENV === "Development" ? err.stack : null,
   });
 };
+

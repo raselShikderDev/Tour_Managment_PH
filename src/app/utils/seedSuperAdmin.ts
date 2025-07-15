@@ -6,7 +6,9 @@ import bcrypt from "bcrypt";
 
 export const seedSuperAdmin = async () => {
   try {
-    console.log("started checkng super admin existence");
+    if (envVars.NODE_ENV === "Development") {
+      console.log("started checkng super admin existence");
+    }
     const superAdminExist = await userModel.findOne({
       email: envVars.SUPER_ADMIN_EMAIL,
     });
@@ -15,7 +17,9 @@ export const seedSuperAdmin = async () => {
       // console.log(`Superadmin existed: ${superAdminExist}`);
       return;
     }
-    console.log("Creating super admin");
+    if (envVars.NODE_ENV === "Development") {
+      console.log("Creating super admin");
+    }
 
     const hasedPassword = await bcrypt.hash(
       envVars.SUPER_ADMIN_PASSWORD as string,
@@ -36,7 +40,9 @@ export const seedSuperAdmin = async () => {
       auths: [authprovier],
     };
     userModel.create(superAdmin);
-    console.log("Super admin created successfully");
+    if (envVars.NODE_ENV === "Development") {
+      console.log("Super admin created successfully");
+    }
   } catch (error) {
     console.log(`Faild to create default super admin: ${error}`);
   }
