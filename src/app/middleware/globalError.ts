@@ -4,11 +4,17 @@ import { NextFunction, Request, Response } from "express";
 import { envVars } from "../config/env";
 import appError from "../errorHelper/appError";
 
-/**Duplicate error Mongoose */
 
-/**Mongoose cast Error */
 
-/** Mongoose validation error */
+/**Mongoose error can appear as error 
+ * 1. cast Error
+ * 2. Duplicate error
+ * 3. validation error 
+ */
+
+/** Zod Error can appear as error
+ * 1.
+ */
 
 const errorsSource:any = []
 
@@ -45,7 +51,20 @@ export const globalError = (
     const matchedArray = err.message.match(/"([^"]*)"/);
     statusCode = 400;
     message = `${matchedArray[1]} already exists`;
-  } else if (err instanceof appError) {
+  }
+  // Zod Error
+  else if (err.name === "ZodError"){
+    statusCode = 400
+    const issues = err.issues
+    issues.forEach((issue:any)=>{
+      errorsSource.push({
+        path:`${issue.path[issue.path.length - 1]} ${issue.code}` ,
+        message:issue.message,
+      })
+    })
+    message = `Zod Error`
+  }
+   else if (err instanceof appError) {
     statusCode = err.statusCode;
     message = err.message;
   } else if (err instanceof Error) {
