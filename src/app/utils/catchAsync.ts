@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { envVars } from "../config/env";
 
 /* eslint-disable no-console */
 type asyncHandler = (
@@ -10,9 +11,12 @@ type asyncHandler = (
 const catchAsync =
   (fn: asyncHandler) => (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch((err) => {
-      console.log(err);
+      if (envVars.NODE_ENV === "Development") {
+        console.log(err);
+      }
+
       next(err);
     });
   };
 
-  export default catchAsync
+export default catchAsync;
