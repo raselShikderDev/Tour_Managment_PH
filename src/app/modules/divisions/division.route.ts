@@ -8,7 +8,7 @@ import { createDivisionZodValidation, updateDivisionZodValidation } from "./divi
 const router = Router()
 
 router.post("/create", checkAuth(role.ADMIN, role.SUPER_ADMIN),validateRequest(createDivisionZodValidation), divisionController.CreateDivision)
-router.get("/division", checkAuth(role.ADMIN, role.SUPER_ADMIN),divisionController.getAllDivisions)
+router.get("/", checkAuth(role.ADMIN, role.SUPER_ADMIN),divisionController.getAllDivisions)
 router.get("/:id", divisionController.deleteDivision)
 router.patch("/:id", validateRequest(updateDivisionZodValidation), divisionController.deleteDivision)
 

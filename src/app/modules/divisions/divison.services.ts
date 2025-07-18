@@ -18,7 +18,9 @@ const createDivision = async (payload: IDvision) => {
 
 // Getting all divisions
 const getAllDivisions = async()=>{
-    const allDivisions = await divisionModel.find({})
+    const allDivisions = await divisionModel.find()
+      // eslint-disable-next-line no-console
+   console.log("No Division created yet");
     return allDivisions
 }
 

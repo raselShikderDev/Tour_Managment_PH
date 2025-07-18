@@ -14,7 +14,7 @@ const CreateDivision = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const division: IDvision = await divisionServices.createDivision(req.body);
     if (!division)
-      throw new appError(StatusCodes.BAD_GATEWAY, "Division creating is faild");
+      throw new appError(StatusCodes.BAD_GATEWAY, "Somthing went wrong");
     sendResponse(res, {
       statusCode: StatusCodes.CREATED,
       success: true,
