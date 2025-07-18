@@ -1,14 +1,84 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express";
 import catchAsync from "../../utils/catchAsync";
-import { tourServices } from "./tour.services";
+import { tourServices, tourTypeServices } from "./tour.services";
 import sendResponse from "../../utils/sendResponse";
 import { StatusCodes } from "http-status-codes";
 import appError from "../../errorHelper/appError";
 import { envVars } from "../../config/env";
-import { tourModel } from "./tour.model";
 import mongoose from "mongoose";
 
+
+
+/**--------------------------- Tour types Controller -------------------------- */
+//Creating tourType
+const createTourType = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const payload = req.body
+    const newTourType = await tourTypeServices.createTourType(payload)
+     if (!newTourType) {
+    throw new appError(StatusCodes.BAD_GATEWAY, "Somthing went wrong");
+  }
+
+    sendResponse(res, {
+      statusCode: StatusCodes.CREATED,
+      success: true,
+      message: "TourType successfully created ",
+      data: newTourType,
+    });
+})
+
+//Retriving all TourType 
+const getAllTourType = catchAsync(async(req:Request, res:Response, next:NextFunction)=>{
+    const allTourType = await tourTypeServices.getAllTourType()
+     sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Successfully retrived TourType",
+      data: allTourType,
+    });
+})
+
+// Deleteing a TourType
+const deleteTourType = catchAsync(async (req: Request, res: Response, next: NextFunction) =>{
+    const id = req.params.id
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new appError(StatusCodes.BAD_REQUEST, "TourType id is not valid")
+    }
+    const deletedtourType = await tourTypeServices.deleteTourType(id)
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Successfully deleted a tourType",
+      data: null,
+    });
+})
+
+// Updating a TourType
+const updateTourType = catchAsync(async (req: Request, res: Response, next: NextFunction) =>{
+    const id = req.params.id
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new appError(StatusCodes.BAD_REQUEST, "TourType id is not valid")
+    }
+    const payload = req.body
+    const updatedNewdTourType = await tourTypeServices.updateTourType(id, payload)
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Successfully updated a TourType",
+      data: updatedNewdTourType,
+    });
+})
+
+
+export const tourTypeController = {
+  createTourType,
+  getAllTourType,
+  deleteTourType,
+  updateTourType
+}
+
+/**------------------------------ Tour Controller -------------------------------- */
 //Creating tour
 const createTour = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -21,7 +91,7 @@ const createTour = catchAsync(
     sendResponse(res, {
       statusCode: StatusCodes.CREATED,
       success: true,
-      message: "Divison successfully created ",
+      message: "Tour successfully created ",
       data: newTour,
     });
 })
@@ -41,22 +111,22 @@ const getAllTour = catchAsync(async(req:Request, res:Response, next:NextFunction
 const deleteTour = catchAsync(async (req: Request, res: Response, next: NextFunction) =>{
     const id = req.params.id
     if (mongoose.Types.ObjectId.isValid(id)) {
-        throw new appError(StatusCodes.BAD_REQUEST, "Division id is not valid")
+        throw new appError(StatusCodes.BAD_REQUEST, "Tour id is not valid")
     }
     const deletedtour = await tourServices.deleteTour(id)
     sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,
       message: "Successfully deleted a tour",
-      data: envVars.NODE_ENV === "Development" ? deletedtour : null,
+      data: null,
     });
 })
 
 // Updating a Tour
 const updateTour = catchAsync(async (req: Request, res: Response, next: NextFunction) =>{
     const id = req.params.id
-    if (mongoose.Types.ObjectId.isValid(id)) {
-        throw new appError(StatusCodes.BAD_REQUEST, "Division id is not valid")
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new appError(StatusCodes.BAD_REQUEST, "Tour id is not valid")
     }
     const payload = req.body
     const updatedNewdTour = await tourServices.updateTour(id, payload)

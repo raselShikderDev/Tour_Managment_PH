@@ -10,7 +10,6 @@ const divisionSchema = new Schema<IDvision>({
     slug:{
         type:String,
         unique:true,
-        required:true,
     },
     thumbnail:String,
     description:String,

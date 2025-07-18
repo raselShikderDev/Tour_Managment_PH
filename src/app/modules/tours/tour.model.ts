@@ -18,7 +18,6 @@ const tourSchema = new Schema<ITour>({
     slug:{
         type:String,
         unique:true,
-        required:true,
     },
     location:{type:String},
     description:{type:String},

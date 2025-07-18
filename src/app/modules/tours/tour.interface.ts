@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 
 
 export interface ITourTypes{
-    name:string,
+    name:{type:string, uniqe:true},
 }
 
 

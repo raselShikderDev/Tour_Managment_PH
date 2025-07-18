@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express";
 import catchAsync from "../../utils/catchAsync";
@@ -38,7 +39,8 @@ const getAllDivisions = catchAsync(async (req: Request, res: Response, next: Nex
 // Deleting a divion
 const deleteDivision = catchAsync(async (req: Request, res: Response, next: NextFunction) =>{
     const id = req.params.id
-    if (mongoose.Types.ObjectId.isValid(id)) {
+    
+    if (!mongoose.Types.ObjectId.isValid(id)) {
         throw new appError(StatusCodes.BAD_REQUEST, "Division id is not valid")
     }
     const deletedDivision = await divisionServices.deleteDivision(id)
@@ -53,7 +55,9 @@ const deleteDivision = catchAsync(async (req: Request, res: Response, next: Next
 // Updating a divion
 const updateDivision = catchAsync(async (req: Request, res: Response, next: NextFunction) =>{
     const id = req.params.id
-    if (mongoose.Types.ObjectId.isValid(id)) {
+        console.log(`Request for updating division id: ${id}`);
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
         throw new appError(StatusCodes.BAD_REQUEST, "Division id is not valid")
     }
     const payload = req.body
