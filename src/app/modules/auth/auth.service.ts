@@ -112,6 +112,7 @@ const resetPassword = async (
   );
   user.save();
 };
+
 export const authServices = {
   credentialsLogin,
   newAccessToken,
