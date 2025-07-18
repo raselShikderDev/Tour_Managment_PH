@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express";
 import catchAsync from "../../utils/catchAsync";
@@ -133,6 +134,7 @@ const resetPassword = catchAsync(
 
 // Handling google authentiction "/Google/callback" route
 const googleCallback = catchAsync(async (req: Request, res: Response, next: NextFunction)=>{
+  console.log(`req params: ${req.params}`);
  let redirect = req.query.state as string
  if (redirect.startsWith("/")) {
   redirect = redirect.slice(1)
@@ -143,7 +145,9 @@ const googleCallback = catchAsync(async (req: Request, res: Response, next: Next
   }
   const userTokens = await createUserToken(user)
   await setAuthCookie(res, userTokens)
-  res.redirect(`${envVars.FRONEND_URL as string}/${redirect}`)
+  console.log(`frontendUtl: ${envVars.FRONEND_URL}`);
+  
+  res.redirect(`${envVars.FRONEND_URL as string || "http://localhost:5000/api/v1/auth/google/callback"}/${redirect}`)
 })
 
 export const authController = {
