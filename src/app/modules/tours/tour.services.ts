@@ -82,17 +82,18 @@ const createTour = async (payload: ITour) => {
     throw new appError(StatusCodes.NOT_FOUND, "Tour's infromation not found");
   }
 
-  let modifiedSlug = `${payload.title}`.split(" ").join("-").toLocaleLowerCase()
-    .split(" ")
-    .join("-")
-    .toLocaleLowerCase();
-  let counter = 0;
+  // // This part handled by pre hook in model
+  // let modifiedSlug = `${payload.title}`.split(" ").join("-").toLocaleLowerCase()
+  //   .split(" ")
+  //   .join("-")
+  //   .toLocaleLowerCase();
+  // let counter = 0;
   
-  while (await tourModel.exists({ slug: modifiedSlug })) {
-    modifiedSlug = `${modifiedSlug}-${counter++}`;
+  // while (await tourModel.exists({ slug: modifiedSlug })) {
+  //   modifiedSlug = `${modifiedSlug}-${counter++}`;
     
-  }
-  payload.slug = modifiedSlug;
+  // }
+  // payload.slug = modifiedSlug;
   const newTour = await tourModel.create(payload);
   // eslint-disable-next-line no-console
   console.log(newTour);
@@ -101,12 +102,19 @@ const createTour = async (payload: ITour) => {
 };
 
 // Retriving all tours
-const getAllTour = async () => {
-  const allTours = await tourModel.find().sort({ startDate: 1 }).limit(10);
+const getAllTour = async (query:Record<string, string>) => {
+  const filter = query
+  const allTours = await tourModel.find(filter).limit(10);
+  const totalTour = await tourModel.countDocuments()
   // eslint-disable-next-line no-console
   console.log("No Tour created yet");
-  return allTours;
+  return {
+  data: allTours,
+  meta:{
+    total:totalTour,
+  }
 };
+}
 
 // Deleting a Tour
 const deleteTour = async (id: string) => {
@@ -139,17 +147,18 @@ const updateTour = async (id: string, payload: Partial<ITour>) => {
     );
   }
 
-  if (payload.title) {
-    let modifiedSlug = `${payload.title}`.split(" ").join("-")
-    .split(" ")
-    .join("-")
-    .toLocaleLowerCase();
-  let counter = 0;
-  while (await tourModel.exists({ slug: modifiedSlug })) {
-    modifiedSlug = `${modifiedSlug}-${counter++}`;
-  }
-  payload.slug = modifiedSlug;
-  }
+  // // This part handled by pre hook in model
+  // if (payload.title) {
+  //   let modifiedSlug = `${payload.title}`.split(" ").join("-")
+  //   .split(" ")
+  //   .join("-")
+  //   .toLocaleLowerCase();
+  // let counter = 0;
+  // while (await tourModel.exists({ slug: modifiedSlug })) {
+  //   modifiedSlug = `${modifiedSlug}-${counter++}`;
+  // }
+  // payload.slug = modifiedSlug;
+  // }
 
   const updatedNewTour = await tourModel.findByIdAndUpdate(id, payload, {
     new: true,

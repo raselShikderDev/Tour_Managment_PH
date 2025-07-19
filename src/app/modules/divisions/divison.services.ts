@@ -11,15 +11,16 @@ const createDivision = async (payload: IDvision) => {
       "Division's infromation not found"
     );
 
-  let modifiedSlug = `${payload.slug}-division`
-    .split(" ")
-    .join("-")
-    .toLocaleLowerCase();
-  let counter = 0;
-  while (await divisionModel.exists({ slug: modifiedSlug})) {
-    modifiedSlug = `${modifiedSlug}-${counter++}`;
-  }
-  payload.slug = modifiedSlug;
+  // // This part handled by pre hook in model
+  // let modifiedSlug = `${payload.slug}-division`
+  //   .split(" ")
+  //   .join("-")
+  //   .toLocaleLowerCase();
+  // let counter = 0;
+  // while (await divisionModel.exists({ slug: modifiedSlug})) {
+  //   modifiedSlug = `${modifiedSlug}-${counter++}`;
+  // }
+  // payload.slug = modifiedSlug;
   const division = await divisionModel.create(payload);
 
   return division;
@@ -65,17 +66,18 @@ const updateDivision = async (id: string, payload: Partial<IDvision>) => {
     );
   }
 
-  if (payload.name) {
-    let modifiedSlug = `${payload.slug}-division`
-      .split(" ")
-      .join("-")
-      .toLocaleLowerCase();
-    let counter = 0;
-    while (await divisionModel.exists({ slug: modifiedSlug })) {
-      modifiedSlug = `${modifiedSlug}-${counter++}`;
-    }
-    payload.slug = modifiedSlug;
-  }
+  // // This part handled by pre hook in model
+  // if (payload.name) {
+  //   let modifiedSlug = `${payload.slug}-division`
+  //     .split(" ")
+  //     .join("-")
+  //     .toLocaleLowerCase();
+  //   let counter = 0;
+  //   while (await divisionModel.exists({ slug: modifiedSlug })) {
+  //     modifiedSlug = `${modifiedSlug}-${counter++}`;
+  //   }
+  //   payload.slug = modifiedSlug;
+  // }
 
   const updatedNewDivision = await divisionModel.findByIdAndUpdate(
     id,
