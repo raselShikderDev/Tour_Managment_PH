@@ -111,10 +111,12 @@ const getAllTour = catchAsync(async(req:Request, res:Response, next:NextFunction
 // Deleteing a Tour
 const deleteTour = catchAsync(async (req: Request, res: Response, next: NextFunction) =>{
     const id = req.params.id
-    if (mongoose.Types.ObjectId.isValid(id)) {
+    console.log(`Tour Id ${id} reqested for delete`);
+    
+    if (!mongoose.Types.ObjectId.isValid(id)) {
         throw new appError(StatusCodes.BAD_REQUEST, "Tour id is not valid")
     }
-    const deletedtour = await tourServices.deleteTour(id)
+     await tourServices.deleteTour(id)
     sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,
@@ -126,10 +128,12 @@ const deleteTour = catchAsync(async (req: Request, res: Response, next: NextFunc
 // Updating a Tour
 const updateTour = catchAsync(async (req: Request, res: Response, next: NextFunction) =>{
     const id = req.params.id
+    
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        throw new appError(StatusCodes.BAD_REQUEST, "Tour id is not valid")
+      throw new appError(StatusCodes.BAD_REQUEST, "Tour id is not valid")
     }
     const payload = req.body
+    console.log(`Requested for update in tour: `,payload);
     const updatedNewdTour = await tourServices.updateTour(id, payload)
     sendResponse(res, {
       statusCode: StatusCodes.OK,

@@ -75,6 +75,7 @@ tourSchema.pre("save", async function (next) {
 // Pre hook for adding Tour slug at the end of slug while updating tour
 tourSchema.pre("findOneAndUpdate", async function (next) {
   const tour = this.getUpdate() as Partial<ITour>;
+  
   if (tour.title) {
     let modifiedSlug = `${tour.title}`
       .split(" ")
@@ -82,7 +83,22 @@ tourSchema.pre("findOneAndUpdate", async function (next) {
       .split(" ")
       .join("-")
       .toLocaleLowerCase();
-    let counter = 0;
+    let counter = 1;
+    while (await tourModel.exists({ slug: modifiedSlug })) {
+      modifiedSlug = `${modifiedSlug}-${counter++}`;
+    }
+    tour.slug = modifiedSlug;
+    this.setUpdate(tour)
+  }
+  
+  if (tour.slug) {
+    let modifiedSlug = `${tour.slug}`
+      .split(" ")
+      .join("-")
+      .split(" ")
+      .join("-")
+      .toLocaleLowerCase();
+    let counter = 1;
     while (await tourModel.exists({ slug: modifiedSlug })) {
       modifiedSlug = `${modifiedSlug}-${counter++}`;
     }

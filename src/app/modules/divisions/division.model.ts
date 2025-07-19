@@ -34,13 +34,28 @@ divisionSchema.pre("save", async function(next){
 
 // Pre hook for adding division at the end of slug while updating divisin
 divisionSchema.pre("findOneAndUpdate", async function(next){
-    const division = this.getUpdate() as Partial<IDvision>
+    const division = await this.getUpdate() as Partial<IDvision>
+    console.log(`division slug from pre hook ${division.slug}`);
+    
     if(division.name){
+        let modifiedSlug = `${division.name}-division`
+      .split(" ")
+      .join("-")
+      .toLocaleLowerCase();
+    let counter = 1;
+    while (await divisionModel.exists({ slug: modifiedSlug })) {
+      modifiedSlug = `${modifiedSlug}-${counter++}`;
+    }
+    division.slug = modifiedSlug;
+    this.setUpdate(division)
+    }
+    
+    if(division.slug){
         let modifiedSlug = `${division.slug}-division`
       .split(" ")
       .join("-")
       .toLocaleLowerCase();
-    let counter = 0;
+    let counter = 1;
     while (await divisionModel.exists({ slug: modifiedSlug })) {
       modifiedSlug = `${modifiedSlug}-${counter++}`;
     }

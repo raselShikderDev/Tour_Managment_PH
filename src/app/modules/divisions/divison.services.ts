@@ -59,7 +59,7 @@ const updateDivision = async (id: string, payload: Partial<IDvision>) => {
     name: payload.name,
     _id: { $ne: id },
   });
-  if (!isDuplicate) {
+  if (isDuplicate !== null) {
     throw new appError(
       StatusCodes.BAD_REQUEST,
       "A Division with this name already exists"

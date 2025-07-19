@@ -19,10 +19,17 @@ const createTourType = async (payload: Partial<ITourTypes>) => {
 
 // Retriving all tours
 const getAllTourType = async () => {
-  const allTourType = await tourTypeModel.find().sort({ name: 1 }).limit(10);
+    const totalTourType = await tourTypeModel.countDocuments()
+
+  const allTourType = await tourTypeModel.find().limit(10);
   // eslint-disable-next-line no-console
   console.log("No TourType created yet");
-  return allTourType;
+  return  {
+    meta:{
+      total:totalTourType,
+    },
+    data: allTourType,
+};;
 };
 
 // Deleting a TourType
@@ -50,7 +57,7 @@ const updateTourType = async (id: string, payload: Partial<ITourTypes>) => {
     name: payload.name,
     _id: { $ne: id },
   });
-  if (!isDuplicate) {
+  if (isDuplicate !== null) {
     throw new appError(
       StatusCodes.BAD_REQUEST,
       "A TourType with this title already exists"
@@ -95,8 +102,7 @@ const createTour = async (payload: ITour) => {
   // }
   // payload.slug = modifiedSlug;
   const newTour = await tourModel.create(payload);
-  // eslint-disable-next-line no-console
-  console.log(newTour);
+
 
   return newTour;
 };
@@ -104,15 +110,15 @@ const createTour = async (payload: ITour) => {
 // Retriving all tours
 const getAllTour = async (query:Record<string, string>) => {
   const filter = query
+    const totalTour = await tourModel.countDocuments()
   const allTours = await tourModel.find(filter).limit(10);
-  const totalTour = await tourModel.countDocuments()
   // eslint-disable-next-line no-console
   console.log("No Tour created yet");
   return {
+    meta:{
+      total:totalTour,
+    },
   data: allTours,
-  meta:{
-    total:totalTour,
-  }
 };
 }
 
@@ -131,7 +137,7 @@ const updateTour = async (id: string, payload: Partial<ITour>) => {
       "Tour's updated infromation not found"
     );
 
-  const isExist = await tourModel.findById(id);
+  const isExist = await tourModel.findById(id);  
   if (!isExist) {
     throw new appError(StatusCodes.NOT_FOUND, "Tour not found");
   }
@@ -140,7 +146,7 @@ const updateTour = async (id: string, payload: Partial<ITour>) => {
     title: payload.title,
     _id: { $ne: id },
   });
-  if (!isDuplicate) {
+  if (isDuplicate !== null) {
     throw new appError(
       StatusCodes.BAD_REQUEST,
       "A Tour with this title already exists"
