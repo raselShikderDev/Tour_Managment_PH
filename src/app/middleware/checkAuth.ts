@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { NextFunction, Request, Response } from "express";
 import appError from "../errorHelper/appError";
 import { StatusCodes } from "http-status-codes";
@@ -24,7 +23,6 @@ export const checkAuth =
         accessToken,
         envVars.JWT_ACCESS_SECRET as string
       ) as JwtPayload;
-      console.log(`checkAuth - VerifiedToken: ${verifiedToekn}`)
       const userExist = await userModel.findOne({ email: verifiedToekn.email });
       if (!userExist)
         throw new appError(StatusCodes.NOT_FOUND, "User not found");
