@@ -3,7 +3,6 @@ import { StatusCodes } from "http-status-codes";
 import appError from "../../errorHelper/appError";
 import { ITour, ITourTypes } from "./tour.interface";
 import { tourModel, tourTypeModel } from "./tour.model";
-import { Query } from "mongoose";
 
 /**--------------------------- Tour types Services -------------------------- */
 // Creating Tourtype
@@ -110,31 +109,37 @@ const createTour = async (payload: ITour) => {
 // Retriving all tours
 const getAllTour = async (query: Record<string, string>) => {
   const filter = query;
-    console.log("Query: ", query);
   const searchItem = query.searchItem || "";
-  console.log("searchItem: ", searchItem);
+  
   const sort = query.sort || "-createdAt"
-  const feilds = query.feilds.split(",").join(" ") || ""
+  const field = query.fields ? query.fields.split(",").join(" ") : ""
+  const page = Number(query.page) || 1
+  const limit = Number(query.limit) || 5
+  const skip = (page - 1) * limit
   const tourSearchableItem = ["title", "description", "location"];
 
-  const excludFeild = ["searchItem", "sort", "feilds"]
+  const excludFields = ["searchItem", "sort", "fields", "page", "limit"];
 
-  for(const feild of excludFeild){
-    delete filter[feild]
+  for(const field of excludFields){
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+    delete filter[field]
   }
 
   const totalTour = await tourModel.countDocuments();
   const searchQuery = {
-    $or: tourSearchableItem.map((feild) => ({
-      [feild]: { $regex: searchItem, $options: "i" },
+    $or: tourSearchableItem.map((field) => ({
+      [field]: { $regex: searchItem, $options: "i" },
     })),
   };
-  const allTours = await tourModel.find(searchQuery).find(filter).sort(sort).select(feilds);
+  const allTours = await tourModel.find(searchQuery).find(filter).sort(sort).select(field).skip(skip).limit(limit);
   console.log("No Tour created yet");
+  const meta = {
+    page,
+    total:totalTour,
+    limit,
+  }
   return {
-    meta: {
-      total: totalTour,
-    },
+    meta: meta,
     data: allTours,
   };
 };
