@@ -132,7 +132,12 @@ const getAllTour = async (query: Record<string, string>) => {
       [field]: { $regex: searchItem, $options: "i" },
     })),
   };
-  const allTours = await tourModel.find(searchQuery).find(filter).sort(sort).select(field).skip(skip).limit(limit);
+  // const allTours = await tourModel.find(searchQuery).find(filter).sort(sort).select(field).skip(skip).limit(limit);
+
+const filterQuery = tourModel.find(filter)
+const tours = filterQuery.find(searchQuery)
+const allTours = await tours.sort(sort).select(field).skip(skip).limit(limit);
+
   console.log("No Tour created yet");
   const meta = {
     pages:totalPages,
