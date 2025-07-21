@@ -126,6 +126,7 @@ const getAllTour = async (query: Record<string, string>) => {
   }
 
   const totalTour = await tourModel.countDocuments();
+  const totalPages = Math.ceil(totalTour / limit)
   const searchQuery = {
     $or: tourSearchableItem.map((field) => ({
       [field]: { $regex: searchItem, $options: "i" },
@@ -134,7 +135,7 @@ const getAllTour = async (query: Record<string, string>) => {
   const allTours = await tourModel.find(searchQuery).find(filter).sort(sort).select(field).skip(skip).limit(limit);
   console.log("No Tour created yet");
   const meta = {
-    page,
+    pages:totalPages,
     total:totalTour,
     limit,
   }
