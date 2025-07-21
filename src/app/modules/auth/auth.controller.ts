@@ -134,9 +134,8 @@ const resetPassword = catchAsync(
 
 // Handling google authentiction "/Google/callback" route
 const googleCallback = catchAsync(async (req: Request, res: Response, next: NextFunction)=>{
-  console.log(`req params: ${req.params}`);
  let redirect = req.query.state as string
- if (redirect.startsWith("/")) {
+ if (redirect.startsWith("/")){
   redirect = redirect.slice(1)
  }
   const user = req.user
@@ -147,7 +146,7 @@ const googleCallback = catchAsync(async (req: Request, res: Response, next: Next
   await setAuthCookie(res, userTokens)
   console.log(`frontendUtl: ${envVars.FRONEND_URL}`);
   
-  res.redirect(`${envVars.FRONEND_URL as string || "http://localhost:5000/api/v1/auth/google/callback"}/${redirect}`)
+  res.redirect(`${envVars.FRONEND_URL as string}/${redirect}`)
 })
 
 export const authController = {
