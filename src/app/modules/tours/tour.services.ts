@@ -3,6 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import appError from "../../errorHelper/appError";
 import { ITour, ITourTypes } from "./tour.interface";
 import { tourModel, tourTypeModel } from "./tour.model";
+import { Query } from "mongoose";
 
 /**--------------------------- Tour types Services -------------------------- */
 // Creating Tourtype
@@ -112,10 +113,15 @@ const getAllTour = async (query: Record<string, string>) => {
     console.log("Query: ", query);
   const searchItem = query.searchItem || "";
   console.log("searchItem: ", searchItem);
-  
+  const sort = query.sort || "-createdAt"
+  const feilds = query.feilds.split(",").join(" ") || ""
   const tourSearchableItem = ["title", "description", "location"];
 
-  delete filter["searchItem"]
+  const excludFeild = ["searchItem", "sort", "feilds"]
+
+  for(const feild of excludFeild){
+    delete filter[feild]
+  }
 
   const totalTour = await tourModel.countDocuments();
   const searchQuery = {
@@ -123,7 +129,7 @@ const getAllTour = async (query: Record<string, string>) => {
       [feild]: { $regex: searchItem, $options: "i" },
     })),
   };
-  const allTours = await tourModel.find(searchQuery).find(filter);
+  const allTours = await tourModel.find(searchQuery).find(filter).sort(sort).select(feilds);
   console.log("No Tour created yet");
   return {
     meta: {
