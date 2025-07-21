@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { StatusCodes } from "http-status-codes";
 import appError from "../../errorHelper/appError";
 import { ITour, ITourTypes } from "./tour.interface";
@@ -19,17 +20,16 @@ const createTourType = async (payload: Partial<ITourTypes>) => {
 
 // Retriving all tours
 const getAllTourType = async () => {
-    const totalTourType = await tourTypeModel.countDocuments()
+  const totalTourType = await tourTypeModel.countDocuments();
 
   const allTourType = await tourTypeModel.find().limit(10);
-  // eslint-disable-next-line no-console
   console.log("No TourType created yet");
-  return  {
-    meta:{
-      total:totalTourType,
+  return {
+    meta: {
+      total: totalTourType,
     },
     data: allTourType,
-};;
+  };
 };
 
 // Deleting a TourType
@@ -95,32 +95,43 @@ const createTour = async (payload: ITour) => {
   //   .join("-")
   //   .toLocaleLowerCase();
   // let counter = 0;
-  
+
   // while (await tourModel.exists({ slug: modifiedSlug })) {
   //   modifiedSlug = `${modifiedSlug}-${counter++}`;
-    
+
   // }
   // payload.slug = modifiedSlug;
   const newTour = await tourModel.create(payload);
-
 
   return newTour;
 };
 
 // Retriving all tours
-const getAllTour = async (query:Record<string, string>) => {
-  const filter = query
-    const totalTour = await tourModel.countDocuments()
-  const allTours = await tourModel.find(filter).limit(10);
-  // eslint-disable-next-line no-console
+const getAllTour = async (query: Record<string, string>) => {
+  const filter = query;
+    console.log("Query: ", query);
+  const searchItem = query.searchItem || "";
+  console.log("searchItem: ", searchItem);
+  
+  const tourSearchableItem = ["title", "description", "location"];
+
+  delete filter["searchItem"]
+
+  const totalTour = await tourModel.countDocuments();
+  const searchQuery = {
+    $or: tourSearchableItem.map((feild) => ({
+      [feild]: { $regex: searchItem, $options: "i" },
+    })),
+  };
+  const allTours = await tourModel.find(searchQuery).find(filter);
   console.log("No Tour created yet");
   return {
-    meta:{
-      total:totalTour,
+    meta: {
+      total: totalTour,
     },
-  data: allTours,
+    data: allTours,
+  };
 };
-}
 
 // Deleting a Tour
 const deleteTour = async (id: string) => {
@@ -137,7 +148,7 @@ const updateTour = async (id: string, payload: Partial<ITour>) => {
       "Tour's updated infromation not found"
     );
 
-  const isExist = await tourModel.findById(id);  
+  const isExist = await tourModel.findById(id);
   if (!isExist) {
     throw new appError(StatusCodes.NOT_FOUND, "Tour not found");
   }
