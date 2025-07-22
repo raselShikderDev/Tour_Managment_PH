@@ -34,6 +34,14 @@ const getAllTourType = async () => {
   };
 };
 
+// Get singel a TourType by id
+const getSingelTourType = async (id: string) => {
+  const tourType = await tourModel.findById(id);
+  if (tourType === null) throw new appError(StatusCodes.NOT_FOUND, "Tour not found");
+  return tourType;
+};
+
+
 // Deleting a TourType
 const deleteTourType = async (id: string) => {
   const deletedATourType = await tourTypeModel.findByIdAndDelete(id);
@@ -82,6 +90,7 @@ export const tourTypeServices = {
   getAllTourType,
   deleteTourType,
   updateTourType,
+  getSingelTourType
 };
 
 /**------------------------------ Tour Services -------------------------------- */
@@ -111,7 +120,7 @@ const createTour = async (payload: ITour) => {
 // Get singel a Tour by slug
 const getSingelTour = async (slug: string) => {
   const tour = await tourModel.findOne({slug});
-  if (!tour) throw new appError(StatusCodes.NOT_FOUND, "Tour not found");
+  if (tour === null) throw new appError(StatusCodes.NOT_FOUND, "Tour not found");
   return tour;
 };
 

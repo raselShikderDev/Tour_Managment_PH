@@ -41,6 +41,23 @@ const getAllTourType = catchAsync(
   }
 );
 
+//Retriving all TourType
+const getSingelTourType = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new appError(StatusCodes.BAD_REQUEST, "TourType id is not valid");
+    }
+    const TourType = await tourTypeServices.getSingelTourType(id);
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Successfully retrived TourType",
+      data: TourType,
+    });
+  }
+);
+
 // Deleteing a TourType
 const deleteTourType = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -84,6 +101,7 @@ export const tourTypeController = {
   getAllTourType,
   deleteTourType,
   updateTourType,
+  getSingelTourType,
 };
 
 /**------------------------------ Tour Controller -------------------------------- */

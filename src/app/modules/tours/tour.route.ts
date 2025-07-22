@@ -13,16 +13,24 @@ const router = Router();
 
 
 /**--------------------------- Tour types Routes -------------------------- */
+// Create a tourType
 router.post(
   "/create-tour-type",
   checkAuth(role.ADMIN, role.SUPER_ADMIN),
   validateRequest(createTourTypeZodSchema),
   tourTypeController.createTourType
 );
+// Get all touType
 router.get(
   "/tour-types",
   checkAuth(role.ADMIN, role.SUPER_ADMIN),
   tourTypeController.getAllTourType
+);
+ // Get singel tourType by id
+router.get(
+  "/:id",
+  checkAuth(role.ADMIN, role.SUPER_ADMIN),
+  tourTypeController.getSingelTourType
 );
 router.delete(
   "/tour-types/:id",
