@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express";
 import catchAsync from "../../utils/catchAsync";
@@ -9,33 +10,68 @@ import { JwtPayload } from "jsonwebtoken";
 import appError from "../../errorHelper/appError";
 import { createUserToken } from "../../utils/userTokens";
 import { envVars } from "../../config/env";
+import passport from "passport";
 
-// Login by credentials and giving a access token to user API
+// Login by Passport credentials athentication and giving a access token to user API
 const credentialsLogin = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const loggedinInfo = await authServices.credentialsLogin(req.body);
 
-    //    // Setting access Token and refresh token tradional way
-    //     res.cookie("refreshToken", loggedinInfo.refreshToken, {
-    //         httpOnly:true,
-    //         secure:false
-    //     })
-    //     res.cookie("accessToken", loggedinInfo.accessToken, {
-    //         httpOnly:true,
-    //         secure:false
-    //     })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    passport.authenticate("local", async(err:any, user:any, info:any)=>{
+      // if(err) next(err)
+      if(err) next( new appError(StatusCodes.BAD_REQUEST, err))
+      
+      if(!user) next(err)
+      if(!user) next( new appError(StatusCodes.NOT_FOUND, info.message))
 
-    // Setting access Token and refresh token with a utils function
-    setAuthCookie(res, loggedinInfo);
+
+        const userTokens = await createUserToken(user)
+
+        setAuthCookie(res, userTokens);
+
+        const {password, ...rest} = user
 
     sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,
       message: "User logged in successfully",
-      data: loggedinInfo,
+      data: {
+        accesToken:userTokens.accessToken,
+        refreshToken:userTokens.refreshToken,
+        user:rest,
+      },
     });
+
+    })(req, res, next)
   }
 );
+
+// // Login by credentials and giving a access token to user API
+// const credentialsLogin = catchAsync(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     const loggedinInfo = await authServices.credentialsLogin(req.body);
+
+//     //    // Setting access Token and refresh token tradional way
+//     //     res.cookie("refreshToken", loggedinInfo.refreshToken, {
+//     //         httpOnly:true,
+//     //         secure:false
+//     //     })
+//     //     res.cookie("accessToken", loggedinInfo.accessToken, {
+//     //         httpOnly:true,
+//     //         secure:false
+//     //     })
+
+//     // Setting access Token and refresh token with a utils function
+//     setAuthCookie(res, loggedinInfo);
+
+//     sendResponse(res, {
+//       statusCode: StatusCodes.OK,
+//       success: true,
+//       message: "User logged in successfully",
+//       data: loggedinInfo,
+//     });
+//   }
+// );
 
 // Generating new access token by refresh token API
 const getNewAccessToken = catchAsync(
@@ -99,7 +135,7 @@ const resetPassword = catchAsync(
 // Handling google authentiction "/Google/callback" route
 const googleCallback = catchAsync(async (req: Request, res: Response, next: NextFunction)=>{
  let redirect = req.query.state as string
- if (redirect.startsWith("/")) {
+ if (redirect.startsWith("/")){
   redirect = redirect.slice(1)
  }
   const user = req.user
@@ -108,6 +144,8 @@ const googleCallback = catchAsync(async (req: Request, res: Response, next: Next
   }
   const userTokens = await createUserToken(user)
   await setAuthCookie(res, userTokens)
+  console.log(`frontendUtl: ${envVars.FRONEND_URL}`);
+  
   res.redirect(`${envVars.FRONEND_URL as string}/${redirect}`)
 })
 

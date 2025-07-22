@@ -11,10 +11,14 @@ const startServer = async () => {
     
   try {
     await mongoose.connect(envVars.MONGO_URI);
-    console.log("MongoDB has connected successfully");
+    if (envVars.NODE_ENV === "Development") {
+        console.log("MongoDB has connected successfully");
+    }
 
     server = app.listen(envVars.PORT, () => {
-      console.log(`Server is running at port ${envVars.PORT} http://localhost:${envVars.PORT}`);
+        if (envVars.NODE_ENV === "Development") {
+        console.log(`Server is running at port ${envVars.PORT} http://localhost:${envVars.PORT}`);
+    }
     });
   } catch (error) {
     console.log(`Faild to connect with Database or Server: ${error}`);
