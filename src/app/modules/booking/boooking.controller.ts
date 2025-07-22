@@ -6,22 +6,24 @@ import sendResponse from "../../utils/sendResponse";
 import { StatusCodes } from "http-status-codes";
 import appError from "../../errorHelper/appError";
 import mongoose from "mongoose";
+import { bookingServices } from "./booking.services";
+import { JwtPayload } from "jsonwebtoken";
 
-/**--------------------------- Tour types Controller -------------------------- */
+
 //Creating Booking
 const createBooking = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const payload = req.body;
-   
-    // if (!newTourType) {
-    //   throw new appError(StatusCodes.BAD_GATEWAY, "Somthing went wrong");
-    // }
+    const decodedToken = req.user as JwtPayload
+   // eslint-disable-next-line no-console
+   console.log(`User from req: ${req.user}`)
+   const bookings = await bookingServices.createBooking(payload, decodedToken.userId)
 
     sendResponse(res, {
       statusCode: StatusCodes.CREATED,
       success: true,
-      message: "TourType successfully created ",
-      data: null,
+      message: "Booking successfully created ",
+      data: bookings,
     });
   }
 );
@@ -29,12 +31,12 @@ const createBooking = catchAsync(
 //Retriving all Booking
 const getAllBooking = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const allTourType = null
+    const allBooking = bookingServices.getAllBooking()
     sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,
-      message: "Successfully retrived TourType",
-      data: allTourType,
+      message: "Successfully retrived booking",
+      data: allBooking,
     });
   }
 );
@@ -43,12 +45,12 @@ const getAllBooking = catchAsync(
 const getUserBooking= catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     
-    const TourType = null
+    const booking = bookingServices.getSingelBooking("")
     sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,
-      message: "Successfully retrived TourType",
-      data: TourType,
+      message: "Successfully retrived booking",
+      data: booking,
     });
   }
 );

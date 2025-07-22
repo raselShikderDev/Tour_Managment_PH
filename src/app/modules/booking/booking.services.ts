@@ -3,27 +3,70 @@
 
 import { StatusCodes } from "http-status-codes";
 import appError from "../../errorHelper/appError";
-import { Ibooking } from "./booking.interface";
+import { BOOKING_STATUS, Ibooking } from "./booking.interface";
+import { userModel } from "../users/user.model";
+import { tourModel } from "../tours/tour.model";
+import { bookingModel } from "./boooking.model";
+import { paymentModel } from "../payment/payment.model";
+import { PAYMENT_STATUS } from "../payment/payment.interfce";
 
+const GenerateTransactionId = (id: string): string => {
+  return `trans_${Date.now()}_${Math.floor(Math.random() * 1000)}_${id.slice(
+    18
+  )}`;
+};
 
 // Creating Booking
-const createBooking = async (payload:Ibooking) => {
-  if (!payload) {
+const createBooking = async (payload: Partial<Ibooking>, userId: string) => {
+  const user = await userModel.findById(userId);
+
+  if (!user?.phone || !user.address) {
     throw new appError(
-      StatusCodes.NOT_FOUND,
-      "Bookings's infromation not found"
+      StatusCodes.BAD_REQUEST,
+      "Please update your profile to book a tour"
     );
   }
 
-  const newBooking = null
-  return newBooking;
+  const tourCost = await tourModel.findById(payload.tour).select("costForm");
+  if (!tourCost) {
+    throw new appError(StatusCodes.BAD_REQUEST, "No tour cost found");
+  }
+
+  const amount = Number(tourCost) * Number(payload.guestCount);
+
+  const transId = GenerateTransactionId(userId);
+
+  const booking = await bookingModel.create({
+    user: userId,
+    status: BOOKING_STATUS.PENDING,
+    ...payload,
+  });
+
+  const payment = await paymentModel.create({
+    booking: booking._id,
+    status: PAYMENT_STATUS.UNPAID,
+    transactionId: transId,
+    amount,
+  });
+
+  const updatedBooking = await bookingModel
+    .findByIdAndUpdate(
+      booking._id,
+      { payment: payment._id },
+      { new: true, runValidators: true }
+    )
+    .populate("Users", "name email phone address")
+    .populate("Tour", "title costForm")
+    .populate("Payments");
+
+  return updatedBooking;
 };
 
 // Retriving all tours
 const getAllBooking = async () => {
-  const totalBooking = null
+  const totalBooking = null;
 
-  const allBooking = null
+  const allBooking = null;
   console.log("No Booking created yet");
   return {
     meta: {
@@ -35,34 +78,34 @@ const getAllBooking = async () => {
 
 // Get singel a Booking by id
 const getSingelBooking = async (id: string) => {
-  const Booking = null
-  if (Booking === null) throw new appError(StatusCodes.NOT_FOUND, "Tour not found");
+  const Booking = null;
+  if (Booking === null)
+    throw new appError(StatusCodes.NOT_FOUND, "Tour not found");
   return Booking;
 };
 
-
 // Deleting a Booking
 const deleteBooking = async (id: string) => {
-  const deletedABooking = null
+  const deletedABooking = null;
   if (!deleteBooking)
     throw new appError(StatusCodes.NOT_FOUND, "Booking not found");
   return deletedABooking;
 };
 
 // Updating Booking
-const updateBooking = async (id: string, payload:Partial<Ibooking>) => {
+const updateBooking = async (id: string, payload: Partial<Ibooking>) => {
   if (!payload)
     throw new appError(
       StatusCodes.NOT_FOUND,
       "Booking's updated infromation not found"
     );
 
-  const isExist = null
+  const isExist = null;
   if (!isExist) {
     throw new appError(StatusCodes.NOT_FOUND, "Booking not found");
   }
 
-  const isDuplicate =null
+  const isDuplicate = null;
   if (isDuplicate !== null) {
     throw new appError(
       StatusCodes.BAD_REQUEST,
@@ -70,7 +113,7 @@ const updateBooking = async (id: string, payload:Partial<Ibooking>) => {
     );
   }
 
-  const updatedNewBooking = null
+  const updatedNewBooking = null;
   if (!updatedNewBooking)
     throw new appError(StatusCodes.NOT_FOUND, "Booking not found");
 
@@ -82,5 +125,5 @@ export const bookingServices = {
   getAllBooking,
   deleteBooking,
   updateBooking,
-  getSingelBooking
+  getSingelBooking,
 };

@@ -11,7 +11,7 @@ export enum PAYMENT_STATUS {
 
 export interface IPayment {
     booking:Types.ObjectId,
-    bookingId:string,
+    transactionId:string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     paymentGateway?:any,
     invoieUrl?:string,

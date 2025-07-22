@@ -1,11 +1,3 @@
-//  booking:Types.ObjectId,
-//     bookingId:string,
-//     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//     paymentGateway?:any,
-//     invoieUrl?:string,
-//     status:PAYMENT_STATUS,
-//     amount:number,
-
 import mongoose, { Schema } from "mongoose";
 import { IPayment, PAYMENT_STATUS } from "./payment.interfce";
 
@@ -17,7 +9,7 @@ const paymentSchema = new mongoose.Schema<IPayment>({
         required:true,
         unique:true,
     },
-    bookingId:{
+    transactionId:{
         type:String,
         required:true,
         unique:true
