@@ -7,6 +7,9 @@ import sendResponse from "../../utils/sendResponse";
 import { verifyJwtToken } from "../../utils/jwt";
 import { envVars } from "../../config/env";
 import { JwtPayload } from "jsonwebtoken";
+import mongoose from "mongoose";
+import appError from "../../errorHelper/appError";
+import { log } from "console";
 
 // Getting all user using custom async handleer - Which decrese using tryCatch repeatedly
 const getAllUsers = catchAsync(
@@ -96,7 +99,9 @@ const createUser = catchAsync(
  */
 const deleteUser = catchAsync(async( req: Request, res: Response, next: NextFunction)=>{
   const userId = req.params.userId
-
+ if (!mongoose.Types.ObjectId.isValid(userId)) {
+      throw new appError(StatusCodes.BAD_REQUEST, "User id is not valid");
+    }
   const deletedUser = await userServices.deleteuser(userId)
 
   sendResponse(res, {
@@ -107,10 +112,32 @@ const deleteUser = catchAsync(async( req: Request, res: Response, next: NextFunc
     })
 })
 
+// Retriveve singel a user
+const getSingelUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.userId;
+    console.log(`User id reqestd: ${id}`);
+    
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new appError(StatusCodes.BAD_REQUEST, "User id is not valid");
+    }
+   const user = await userServices.getSingelUser(id);
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Successfully retrived a user",
+      data: user,
+    });
+  }
+);
+
 // Updating user info
 const updateUser = catchAsync(async( req: Request, res: Response, next: NextFunction)=>{
   
   const userId = req.params.userId
+   if (!mongoose.Types.ObjectId.isValid(userId)) {
+      throw new appError(StatusCodes.BAD_REQUEST, "User id is not valid");
+    }
   const payload = req.body
   // const token = req.headers.authorization
   // const verifiedToken = verifyJwtToken(token as string, envVars.JWT_ACCESS_SECRET as string) as JwtPayload
@@ -133,4 +160,5 @@ export const userCcontroller = {
   getAllUsers,
   updateUser,
   deleteUser,
+  getSingelUser
 };

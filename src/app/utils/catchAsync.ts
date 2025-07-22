@@ -14,7 +14,6 @@ const catchAsync =
       if (envVars.NODE_ENV === "Development") {
         console.log(err);
       }
-
       next(err);
     });
   };

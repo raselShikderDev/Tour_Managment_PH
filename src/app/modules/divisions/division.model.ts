@@ -1,6 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import { IDvision } from "./division.interface";
 
+
 const divisionSchema = new Schema<IDvision>({
     name:{
         type:String,
@@ -10,12 +11,56 @@ const divisionSchema = new Schema<IDvision>({
     slug:{
         type:String,
         unique:true,
-        required:true,
     },
     thumbnail:String,
     description:String,
 },{
     timestamps:true,
+})
+
+// Pre hook for adding division at the end of slug while creating 
+divisionSchema.pre("save", async function(next){
+    let modifiedSlug = `${this.slug}-division`
+    .split(" ")
+    .join("-")
+    .toLocaleLowerCase();
+  let counter = 0;
+  while (await divisionModel.exists({ slug: modifiedSlug})) {
+    modifiedSlug = `${modifiedSlug}-${counter++}`;
+  }
+  this.slug = modifiedSlug;
+    next()
+})
+
+// Pre hook for adding division at the end of slug while updating divisin
+divisionSchema.pre("findOneAndUpdate", async function(next){
+    const division = await this.getUpdate() as Partial<IDvision>    
+    if(division.name){
+        let modifiedSlug = `${division.name}-division`
+      .split(" ")
+      .join("-")
+      .toLocaleLowerCase();
+    let counter = 1;
+    while (await divisionModel.exists({ slug: modifiedSlug })) {
+      modifiedSlug = `${modifiedSlug}-${counter++}`;
+    }
+    division.slug = modifiedSlug;
+    this.setUpdate(division)
+    }
+    
+    if(division.slug){
+        let modifiedSlug = `${division.slug}-division`
+      .split(" ")
+      .join("-")
+      .toLocaleLowerCase();
+    let counter = 1;
+    while (await divisionModel.exists({ slug: modifiedSlug })) {
+      modifiedSlug = `${modifiedSlug}-${counter++}`;
+    }
+    division.slug = modifiedSlug;
+    this.setUpdate(division)
+    }
+    next()
 })
 
 export const divisionModel = mongoose.model("Division", divisionSchema)

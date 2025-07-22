@@ -30,4 +30,9 @@ router.patch("/:userId", validateRequest(paramsSchema), validateRequest(updateUs
 // Delete user
 router.delete("/:userId", validateRequest(paramsSchema), checkAuth(role.ADMIN, role.SUPER_ADMIN), userCcontroller.getAllUsers)
 
+// Get singel user
+router.get("/:userId", checkAuth(role.ADMIN, role.SUPER_ADMIN), userCcontroller.getSingelUser)
+
+//
+
 export const userRoutes = router;

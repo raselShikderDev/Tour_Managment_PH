@@ -6,6 +6,8 @@ import bcrypt from "bcrypt";
 import { envVars } from "../../config/env";
 import { JwtPayload } from "jsonwebtoken";
 
+
+// Create a user
 const createUser = async (payload: Partial<IUser>) => {
   const { email, password, ...rest } = payload;
   
@@ -33,6 +35,7 @@ const createUser = async (payload: Partial<IUser>) => {
   return user;
 };
 
+// Get All user
 const getAllUser = async () => {
   const allUser = await userModel.find({});
   const meta = await userModel.countDocuments();
@@ -42,6 +45,14 @@ const getAllUser = async () => {
   };
 };
 
+// Get a singel User
+const getSingelUser = async (id:string)=>{
+  const user = await userModel.findById(id);
+  if (user === null) throw new appError(StatusCodes.NOT_FOUND, "User not found");
+  return user;
+};
+
+// Update a user
 const updateUser = async (
   userId: string,
   payload: Partial<IUser>,
@@ -83,6 +94,7 @@ const updateUser = async (
   return updateUser;
 };
 
+// Delete a user
 const deleteuser = async (userid:string)=>{
   const deletedUser = await userModel.findByIdAndDelete(userid)
   return deletedUser
@@ -93,4 +105,5 @@ export const userServices = {
   getAllUser,
   updateUser,
   deleteuser,
+  getSingelUser,
 };
