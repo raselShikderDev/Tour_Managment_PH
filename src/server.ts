@@ -1,30 +1,31 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
 import { Server } from "http";
 import mongoose from "mongoose";
 import app from "./app";
 import { envVars } from "./app/config/env";
+import { seedSuperAdmin } from "./app/utils/seedSuperAdmin";
 
 let server: Server;
-const port = 5000;
 
 const startServer = async () => {
     
   try {
-    await mongoose.connect(
-      "mongodb+srv://mongodb:mongodb@cluster0.em4cgxh.mongodb.net/Tour_Managment_PH?retryWrites=true&w=majority&appName=Cluster0"
-    );
+    await mongoose.connect(envVars.MONGO_URI);
     console.log("MongoDB has connected successfully");
 
-    server = app.listen(port, () => {
-      console.log(`Server is running at port ${port} http://localhost:${port}`);
+    server = app.listen(envVars.PORT, () => {
+      console.log(`Server is running at port ${envVars.PORT} http://localhost:${envVars.PORT}`);
     });
   } catch (error) {
     console.log(`Faild to connect with Database or Server: ${error}`);
   }
 };
 
-startServer();
+
+(async()=>{
+await startServer();
+ await seedSuperAdmin();
+})()
 
 /**
  * Unhandled rejection Error
