@@ -117,7 +117,7 @@ const getSingelTour = catchAsync(
       statusCode: StatusCodes.OK,
       success: true,
       message: "Successfully retrived a tour",
-      data: null,
+      data: singelTour,
     });
   }
 );

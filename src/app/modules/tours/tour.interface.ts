@@ -15,6 +15,8 @@ export interface ITour{
     costForm?:number,
     startDate?:Date,
     endDate?:Date,
+    departureLocation:string,
+    arrivalLocation:string,
     tourType?:Types.ObjectId,
     included?:string[],
     excluded?:string[],

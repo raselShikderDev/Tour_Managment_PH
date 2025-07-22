@@ -9,6 +9,7 @@ import { envVars } from "../../config/env";
 import { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
 import appError from "../../errorHelper/appError";
+import { log } from "console";
 
 // Getting all user using custom async handleer - Which decrese using tryCatch repeatedly
 const getAllUsers = catchAsync(
@@ -114,8 +115,9 @@ const deleteUser = catchAsync(async( req: Request, res: Response, next: NextFunc
 // Retriveve singel a user
 const getSingelUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const id = req.params.id;
-
+    const id = req.params.userId;
+    console.log(`User id reqestd: ${id}`);
+    
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new appError(StatusCodes.BAD_REQUEST, "User id is not valid");
     }
