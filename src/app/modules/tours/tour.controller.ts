@@ -9,17 +9,15 @@ import appError from "../../errorHelper/appError";
 import { envVars } from "../../config/env";
 import mongoose from "mongoose";
 
-
-
 /**--------------------------- Tour types Controller -------------------------- */
 //Creating tourType
 const createTourType = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const payload = req.body
-    const newTourType = await tourTypeServices.createTourType(payload)
-     if (!newTourType) {
-    throw new appError(StatusCodes.BAD_GATEWAY, "Somthing went wrong");
-  }
+    const payload = req.body;
+    const newTourType = await tourTypeServices.createTourType(payload);
+    if (!newTourType) {
+      throw new appError(StatusCodes.BAD_GATEWAY, "Somthing went wrong");
+    }
 
     sendResponse(res, {
       statusCode: StatusCodes.CREATED,
@@ -27,67 +25,76 @@ const createTourType = catchAsync(
       message: "TourType successfully created ",
       data: newTourType,
     });
-})
+  }
+);
 
-//Retriving all TourType 
-const getAllTourType = catchAsync(async(req:Request, res:Response, next:NextFunction)=>{
-    const allTourType = await tourTypeServices.getAllTourType()
-     sendResponse(res, {
+//Retriving all TourType
+const getAllTourType = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const allTourType = await tourTypeServices.getAllTourType();
+    sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,
       message: "Successfully retrived TourType",
       data: allTourType,
     });
-})
+  }
+);
 
 // Deleteing a TourType
-const deleteTourType = catchAsync(async (req: Request, res: Response, next: NextFunction) =>{
-    const id = req.params.id
+const deleteTourType = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id;
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        throw new appError(StatusCodes.BAD_REQUEST, "TourType id is not valid")
+      throw new appError(StatusCodes.BAD_REQUEST, "TourType id is not valid");
     }
-    const deletedtourType = await tourTypeServices.deleteTourType(id)
+    await tourTypeServices.deleteTourType(id);
     sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,
       message: "Successfully deleted a tourType",
       data: null,
     });
-})
+  }
+);
 
 // Updating a TourType
-const updateTourType = catchAsync(async (req: Request, res: Response, next: NextFunction) =>{
-    const id = req.params.id
+const updateTourType = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id;
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        throw new appError(StatusCodes.BAD_REQUEST, "TourType id is not valid")
+      throw new appError(StatusCodes.BAD_REQUEST, "TourType id is not valid");
     }
-    const payload = req.body
-    const updatedNewdTourType = await tourTypeServices.updateTourType(id, payload)
+    const payload = req.body;
+    const updatedNewdTourType = await tourTypeServices.updateTourType(
+      id,
+      payload
+    );
     sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,
       message: "Successfully updated a TourType",
       data: updatedNewdTourType,
     });
-})
-
+  }
+);
 
 export const tourTypeController = {
   createTourType,
   getAllTourType,
   deleteTourType,
-  updateTourType
-}
+  updateTourType,
+};
 
 /**------------------------------ Tour Controller -------------------------------- */
 //Creating tour
 const createTour = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const payload = req.body
-    const newTour = await tourServices.createTour(payload)
-     if (!newTour) {
-    throw new appError(StatusCodes.BAD_GATEWAY, "Somthing went wrong");
-  }
+    const payload = req.body;
+    const newTour = await tourServices.createTour(payload);
+    if (!newTour) {
+      throw new appError(StatusCodes.BAD_GATEWAY, "Somthing went wrong");
+    }
 
     sendResponse(res, {
       statusCode: StatusCodes.CREATED,
@@ -95,58 +102,84 @@ const createTour = catchAsync(
       message: "Tour successfully created ",
       data: newTour,
     });
-})
+  }
+);
 
-//Retriving all Tour 
-const getAllTour = catchAsync(async(req:Request, res:Response, next:NextFunction)=>{
-  const query = req.query
-    const allTour = await tourServices.getAllTour(query as  Record<string, string>)
-     sendResponse(res, {
+// get singel tour by slug
+const getSingelTour = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const slug: string = req.params.slug;
+    const singelTour = await tourServices.getSingelTour(slug);
+    if (Object.values(singelTour).length === 0) {
+      throw new appError(StatusCodes.BAD_REQUEST, "Tour id is not valid");
+    }
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Successfully retrived a tour",
+      data: null,
+    });
+  }
+);
+
+//Retriving all Tour
+const getAllTour = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const query = req.query;
+    const allTour = await tourServices.getAllTour(
+      query as Record<string, string>
+    );
+    sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,
       message: "Successfully retrived Tours",
       data: allTour,
     });
-})
+  }
+);
 
 // Deleteing a Tour
-const deleteTour = catchAsync(async (req: Request, res: Response, next: NextFunction) =>{
-    const id = req.params.id
-    console.log(`Tour Id ${id} reqested for delete`);
-    
+const deleteTour = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id;
+
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        throw new appError(StatusCodes.BAD_REQUEST, "Tour id is not valid")
+      throw new appError(StatusCodes.BAD_REQUEST, "Tour id is not valid");
     }
-     await tourServices.deleteTour(id)
+    await tourServices.deleteTour(id);
     sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,
       message: "Successfully deleted a tour",
       data: null,
     });
-})
+  }
+);
 
 // Updating a Tour
-const updateTour = catchAsync(async (req: Request, res: Response, next: NextFunction) =>{
-    const id = req.params.id
-    
+const updateTour = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id;
+
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new appError(StatusCodes.BAD_REQUEST, "Tour id is not valid")
+      throw new appError(StatusCodes.BAD_REQUEST, "Tour id is not valid");
     }
-    const payload = req.body
-    console.log(`Requested for update in tour: `,payload);
-    const updatedNewdTour = await tourServices.updateTour(id, payload)
+    const payload = req.body;
+    console.log(`Requested for update in tour: `, payload);
+    const updatedNewdTour = await tourServices.updateTour(id, payload);
     sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,
       message: "Successfully updated a Tour",
       data: updatedNewdTour,
     });
-})
+  }
+);
 
-export const tourController ={
-    createTour,
-    getAllTour,
-    deleteTour,
-    updateTour,
-}
+export const tourController = {
+  createTour,
+  getAllTour,
+  deleteTour,
+  updateTour,
+  getSingelTour,
+};

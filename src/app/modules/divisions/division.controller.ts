@@ -9,6 +9,7 @@ import { StatusCodes } from "http-status-codes";
 import sendResponse from "../../utils/sendResponse";
 import { envVars } from "../../config/env";
 import mongoose from "mongoose";
+import { divisionModel } from "./division.model";
 
 // Creating divisions
 const CreateDivision = catchAsync(
@@ -21,6 +22,24 @@ const CreateDivision = catchAsync(
       success: true,
       message: "Divison successfully created ",
       data: division,
+    });
+  }
+);
+
+// Get a singel Division\
+const getSingelDivision = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const slug = req.params.slug;
+    const singelDivision = await divisionServices.getSingelDivision(slug);
+        if (Object.values(singelDivision).length === 0) {
+          throw new appError(StatusCodes.BAD_REQUEST, "Tour id is not valid");
+        }
+    
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Successfully retrived a division",
+      data: singelDivision,
     });
   }
 );
@@ -75,4 +94,5 @@ export const divisionController = {
   getAllDivisions,
   deleteDivision,
   updateDivision,
+  getSingelDivision,
 };

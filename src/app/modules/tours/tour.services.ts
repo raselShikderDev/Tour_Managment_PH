@@ -108,6 +108,12 @@ const createTour = async (payload: ITour) => {
   return newTour;
 };
 
+// Get singel a Tour by slug
+const getSingelTour = async (slug: string) => {
+  const tour = await tourModel.findOne({slug});
+  if (!tour) throw new appError(StatusCodes.NOT_FOUND, "Tour not found");
+  return tour;
+};
 
 // Retriving all tours bu query buuilder class
 const getAllTour = async (query: Record<string, string>) => {
@@ -233,4 +239,5 @@ export const tourServices = {
   getAllTour,
   deleteTour,
   updateTour,
+  getSingelTour,
 };

@@ -34,9 +34,7 @@ divisionSchema.pre("save", async function(next){
 
 // Pre hook for adding division at the end of slug while updating divisin
 divisionSchema.pre("findOneAndUpdate", async function(next){
-    const division = await this.getUpdate() as Partial<IDvision>
-    console.log(`division slug from pre hook ${division.slug}`);
-    
+    const division = await this.getUpdate() as Partial<IDvision>    
     if(division.name){
         let modifiedSlug = `${division.name}-division`
       .split(" ")

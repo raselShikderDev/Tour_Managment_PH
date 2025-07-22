@@ -26,6 +26,13 @@ const createDivision = async (payload: IDvision) => {
   return division;
 };
 
+// Get a singel Division
+const getSingelDivision = async (slug:string)=>{
+  const division = await divisionModel.findOne({slug});
+  if (division === null) throw new appError(StatusCodes.NOT_FOUND, "Division not found");
+  return division;
+};
+
 // Getting all divisions
 const getAllDivisions = async () => {
   const allDivisions = await divisionModel.find();
@@ -95,4 +102,6 @@ export const divisionServices = {
   getAllDivisions,
   deleteDivision,
   updateDivision,
+getSingelDivision,
+
 };
