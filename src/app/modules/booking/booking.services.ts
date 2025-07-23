@@ -10,6 +10,7 @@ import { bookingModel } from "./boooking.model";
 import { paymentModel } from "../payment/payment.model";
 import { PAYMENT_STATUS } from "../payment/payment.interfce";
 
+// Generating Transaction id with mixture of current date userId and random Number
 const GenerateTransactionId = (id: string): string => {
   return `trans_${Date.now()}_${Math.floor(Math.random() * 1000)}_${id.slice(
     18
@@ -18,8 +19,11 @@ const GenerateTransactionId = (id: string): string => {
 
 // Creating Booking
 const createBooking = async (payload: Partial<Ibooking>, userId: string) => {
-  const user = await userModel.findById(userId);
+  const session = await bookingModel.startSession()
+  session.startTransaction()
 
+  try {
+    const user = await userModel.findById(userId);
   if (!user?.phone || !user.address) {
     throw new appError(
       StatusCodes.BAD_REQUEST,
@@ -36,30 +40,37 @@ const createBooking = async (payload: Partial<Ibooking>, userId: string) => {
 
   const transId = GenerateTransactionId(userId);
 
-  const booking = await bookingModel.create({
+  const booking = await bookingModel.create([{
     user: userId,
     status: BOOKING_STATUS.PENDING,
     ...payload,
-  });
+  }], {session});
 
   const payment = await paymentModel.create({
-    booking: booking._id,
+    booking: booking[0]._id,
     status: PAYMENT_STATUS.UNPAID,
     transactionId: transId,
     amount,
-  });
+  }, {session});
 
   const updatedBooking = await bookingModel
     .findByIdAndUpdate(
-      booking._id,
-      { payment: payment._id },
-      { new: true, runValidators: true }
+      booking[0]._id,
+      { payment: payment[0]._id },
+      { new: true, runValidators: true, session }
     )
     .populate("Users", "name email phone address")
     .populate("Tour", "title costForm")
     .populate("Payments");
 
+    session.commitTransaction()
+    session.endSession()
   return updatedBooking;
+  } catch (error) {
+    session.abortTransaction()
+    session.endSession()
+    throw error
+  }
 };
 
 // Retriving all tours
