@@ -13,8 +13,9 @@ import { default as axios } from 'axios';
             total_amount: payload.name,
             currency: "BDT",
             tran_id: payload.transactionId,
-            success_url: envVars.SSL.SSL_SUCCESS_BACKEND_URL,
-            cancel_url: envVars.SSL.SSL_CANCEL_BACKEND_URL,
+            success_url: `${envVars.SSL.SSL_SUCCESS_BACKEND_URL}?transactionId=${payload.transactionId}&amount=${payload.amount}&status=success$`,
+            cancel_url: `${envVars.SSL.SSL_CANCEL_BACKEND_URL}?transactionId=${payload.transactionId}&amount=${payload.amount}&status=cancel$`,
+            fail_url: `${envVars.SSL.SSL_FAIL_BACKEND_URL}?transactionId=${payload.transactionId}&amount=${payload.amount}&status=fail$`,
             // ipn_url: "http://localhost:3030/ipn",
             shipping_method: "N/A",
             product_name: "Tour",
@@ -52,8 +53,8 @@ import { default as axios } from 'axios';
       if (envVars.NODE_ENV === "Development") {
         // eslint-disable-next-line no-console
         console.log(error);
-        throw new appError(StatusCodes.BAD_REQUEST, error.message)
       }
+      throw new appError(StatusCodes.BAD_REQUEST, error.message)
     }
 
 }

@@ -1,100 +1,66 @@
-
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express";
 import catchAsync from "../../utils/catchAsync";
+import { paymentServices } from "./payment.services";
+import { envVars } from "../../config/env";
 import sendResponse from "../../utils/sendResponse";
 import { StatusCodes } from "http-status-codes";
-import appError from "../../errorHelper/appError";
-import mongoose from "mongoose";
 
-/**--------------------------- Tour types Controller -------------------------- */
-//Creating Payment
-const createPayment = catchAsync(
+
+// Initial Payment
+const initPayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const payload = req.body;
-   
-    // if (!newTourType) {
-    //   throw new appError(StatusCodes.BAD_GATEWAY, "Somthing went wrong");
-    // }
-
+   const bookingid = req.params.bookingid
+   const result = await paymentServices.initPayment(bookingid)
     sendResponse(res, {
-      statusCode: StatusCodes.CREATED,
-      success: true,
-      message: "TourType successfully created ",
-      data: null,
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Payment done successfully",
+        data: result,
     });
   }
 );
 
-//Retriving all Payment
-const getAllPayment = catchAsync(
+//Success Payment
+const successPayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const allTourType = null
-    sendResponse(res, {
-      statusCode: StatusCodes.OK,
-      success: true,
-      message: "Successfully retrived TourType",
-      data: allTourType,
-    });
+   const query = req.query
+   const result = await paymentServices.successPayment(query as Record<string, string>)
+   if(result?.success){
+    res.redirect(`${envVars.SSL.SSL_SUCCESS_FRONTEND_URL as string}?transactionId=${req.query.transactionId}&amount=${req.query.amount}&status=success$`)
+   }
   }
 );
 
-//Retriving a Payment
-const getSingelPayment= catchAsync(
+//Fail Payment
+const failPayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const id = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new appError(StatusCodes.BAD_REQUEST, "TourType id is not valid");
-    }
-    const TourType = null
-    sendResponse(res, {
-      statusCode: StatusCodes.OK,
-      success: true,
-      message: "Successfully retrived TourType",
-      data: TourType,
-    });
+   const query = req.query
+   const result = await paymentServices.successPayment(query as Record<string, string>)
+   if(result?.success){
+    res.redirect(`${envVars.SSL.SSL_FAIL_FRONTEND_URL as string}?transactionId=${req.query.transactionId}&amount=${req.query.amount}&status=fail$`)
+   }
   }
 );
 
-// Deleteing a Payment
-const deletePayment = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const id = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new appError(StatusCodes.BAD_REQUEST, "TourType id is not valid");
-    }
-    
-    sendResponse(res, {
-      statusCode: StatusCodes.OK,
-      success: true,
-      message: "Successfully deleted a tourType",
-      data: null,
-    });
+//Cancel Payment
+const cancelPayment = catchAsync(
+   async (req: Request, res: Response, next: NextFunction) => {
+   const query = req.query
+   const result = await paymentServices.successPayment(query as Record<string, string>)
+   if(result?.success){
+    res.redirect(`${envVars.SSL.SSL_CANCEL_FRONTEND_URL as string}?transactionId=${req.query.transactionId}&amount=${req.query.amount}&status=cancel$`)
+   }
   }
 );
 
-// Updating a Payment
-const updatePayment = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const id = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new appError(StatusCodes.BAD_REQUEST, "TourType id is not valid");
-    }
-    const payload = req.body;
-    const updatedNewdTourType = null
-    sendResponse(res, {
-      statusCode: StatusCodes.OK,
-      success: true,
-      message: "Successfully updated a TourType",
-      data: updatedNewdTourType,
-    });
-  }
-);
+
+
+
 
 export const paymentController = {
-  createPayment,
-  getAllPayment,
-  deletePayment,
-  updatePayment,
-  getSingelPayment,
+  successPayment,
+  failPayment,
+  cancelPayment,
+  initPayment,
 };
