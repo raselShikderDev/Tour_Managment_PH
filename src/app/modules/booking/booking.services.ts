@@ -9,6 +9,8 @@ import { tourModel } from "../tours/tour.model";
 import { bookingModel } from "./boooking.model";
 import { paymentModel } from "../payment/payment.model";
 import { PAYMENT_STATUS } from "../payment/payment.interfce";
+import { sslServicess } from "../sslcommerz/sslcommerce.service";
+import { ISSLCommerz } from "../sslcommerz/sslcommerce.interface";
 
 // Generating Transaction id with mixture of current date userId and random Number
 const GenerateTransactionId = (id: string): string => {
@@ -19,79 +21,112 @@ const GenerateTransactionId = (id: string): string => {
 
 // Creating Booking
 const createBooking = async (payload: Partial<Ibooking>, userId: string) => {
-  const session = await bookingModel.startSession()
-  session.startTransaction()
+  const session = await bookingModel.startSession();
+  session.startTransaction();
 
   try {
     const user = await userModel.findById(userId);
-  if (!user?.phone || !user.address) {
-    throw new appError(
-      StatusCodes.BAD_REQUEST,
-      "Please update your profile to book a tour"
+    if (!user?.phone || !user.address) {
+      throw new appError(
+        StatusCodes.BAD_REQUEST,
+        "Please update your profile to book a tour"
+      );
+    }
+
+    const tourCost = await tourModel.findById(payload.tour).select("costForm");
+    if (!tourCost || typeof tourCost.costForm !== "number") {
+  throw new appError(StatusCodes.BAD_REQUEST, "No valid cost found for this tour");
+}
+    console.log("tourCost: ", tourCost);
+    
+    if (!tourCost) {
+      throw new appError(StatusCodes.BAD_REQUEST, "No tour cost found");
+    }
+
+    const amount = Number(tourCost) * Number(payload.guestCount);
+
+    const transId = GenerateTransactionId(userId);
+
+    const booking = await bookingModel.create(
+      [
+        {
+          user: userId,
+          status: BOOKING_STATUS.PENDING,
+          ...payload,
+        },
+      ],
+      { session }
     );
-  }
 
-  const tourCost = await tourModel.findById(payload.tour).select("costForm");
-  if (!tourCost) {
-    throw new appError(StatusCodes.BAD_REQUEST, "No tour cost found");
-  }
+    const payment = await paymentModel.create(
+      {
+        booking: booking[0]._id,
+        status: PAYMENT_STATUS.UNPAID,
+        transactionId: transId,
+        amount: amount,
+      },
+      { session }
+    );
 
-  const amount = Number(tourCost) * Number(payload.guestCount);
+    const updatedBooking = await bookingModel
+      .findByIdAndUpdate(
+        booking[0]._id,
+        { payment: payment[0]._id },
+        { new: true, runValidators: true, session }
+      )
+      .populate("Users", "name email phone address")
+      .populate("Tour", "title costForm")
+      .populate("Payments");
 
-  const transId = GenerateTransactionId(userId);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userEmail = (updatedBooking?.user as any).email;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userName = (updatedBooking?.user as any).name;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userAddress = (updatedBooking?.user as any).address;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userPhone = (updatedBooking?.user as any).phoneNumber;
 
-  const booking = await bookingModel.create([{
-    user: userId,
-    status: BOOKING_STATUS.PENDING,
-    ...payload,
-  }], {session});
+    const sslPaylaod: ISSLCommerz = {
+      amount: amount,
+      transactionId: transId,
+      name: userName,
+      email: userEmail,
+      phoneNumber: userPhone,
+      address: userAddress,
+    };
 
-  const payment = await paymentModel.create({
-    booking: booking[0]._id,
-    status: PAYMENT_STATUS.UNPAID,
-    transactionId: transId,
-    amount,
-  }, {session});
+    const sslPayment = await sslServicess.sslPaymentInit(sslPaylaod);
 
-  const updatedBooking = await bookingModel
-    .findByIdAndUpdate(
-      booking[0]._id,
-      { payment: payment[0]._id },
-      { new: true, runValidators: true, session }
-    )
-    .populate("Users", "name email phone address")
-    .populate("Tour", "title costForm")
-    .populate("Payments");
+    session.commitTransaction();
+    session.endSession();
 
-    session.commitTransaction()
-    session.endSession()
-  return updatedBooking;
+    return {
+      payment: sslPayment,
+      booking: updatedBooking,
+    };
   } catch (error) {
-    session.abortTransaction()
-    session.endSession()
-    throw error
+    session.abortTransaction();
+    session.endSession();
+    throw error;
   }
 };
 
 // Retriving all tours
 const getAllBooking = async () => {
-  const totalBooking = null;
-
-  const allBooking = null;
-  console.log("No Booking created yet");
+ 
   return {
     meta: {
-      total: totalBooking,
+      total: null,
     },
-    data: allBooking,
+    data: null,
   };
 };
 
 // Get singel a Booking by id
 const getSingelBooking = async (id: string) => {
   const Booking = null;
-  if (Booking === null)
-    throw new appError(StatusCodes.NOT_FOUND, "Tour not found");
+  
   return Booking;
 };
 

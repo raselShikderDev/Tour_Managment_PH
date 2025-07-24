@@ -6,7 +6,7 @@ import appError from "../../errorHelper/appError";
 import { IPayment } from "./payment.interfce";
 
 // Creating Payment
-const createPayment = async (payload:IPayment) => {
+const successPayment = async (payload:IPayment) => {
   if (!payload) {
     throw new appError(
       StatusCodes.NOT_FOUND,
@@ -19,7 +19,7 @@ const createPayment = async (payload:IPayment) => {
 };
 
 // Retriving all tours
-const getAllPayment = async () => {
+const   failPayment = async () => {
   const totalPayment = null
 
   const allPayment = null
@@ -33,53 +33,18 @@ const getAllPayment = async () => {
 };
 
 // Get singel a Payment by id
-const getSingelPayment = async (id: string) => {
+const cancelPayment = async () => {
   const Payment = null
   if (Payment === null) throw new appError(StatusCodes.NOT_FOUND, "Tour not found");
   return Payment;
 };
 
 
-// Deleting a Payment
-const deletePayment = async (id: string) => {
-  const deletedAPayment = null
-  if (!deletePayment)
-    throw new appError(StatusCodes.NOT_FOUND, "Payment not found");
-  return deletedAPayment;
-};
 
-// Updating Payment
-const updatePayment = async (id: string, payload:Partial<IPayment>) => {
-  if (!payload)
-    throw new appError(
-      StatusCodes.NOT_FOUND,
-      "Payment's updated infromation not found"
-    );
 
-  const isExist = null
-  if (!isExist) {
-    throw new appError(StatusCodes.NOT_FOUND, "Payment not found");
-  }
-
-  const isDuplicate =null
-  if (isDuplicate !== null) {
-    throw new appError(
-      StatusCodes.BAD_REQUEST,
-      "A Payment with this title already exists"
-    );
-  }
-
-  const updatedNewPayment = null
-  if (!updatedNewPayment)
-    throw new appError(StatusCodes.NOT_FOUND, "Payment not found");
-
-  return updatedNewPayment;
-};
 
 export const paymentServices = {
-  createPayment,
-  getAllPayment,
-  deletePayment,
-  updatePayment,
-  getSingelPayment
+  successPayment,
+  failPayment,
+  cancelPayment,
 };

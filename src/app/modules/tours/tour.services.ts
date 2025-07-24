@@ -198,11 +198,8 @@ const deleteTour = async (id: string) => {
 
 // Updating Tour
 const updateTour = async (id: string, payload: Partial<ITour>) => {
-  if (!payload)
-    throw new appError(
-      StatusCodes.NOT_FOUND,
-      "Tour's updated infromation not found"
-    );
+  console.log("Tour updated request recived: ", payload);
+  
 
   const isExist = await tourModel.findById(id);
   if (!isExist) {

@@ -183,7 +183,8 @@ const updateTour = catchAsync(
       throw new appError(StatusCodes.BAD_REQUEST, "Tour id is not valid");
     }
     const payload = req.body;
-    console.log(`Requested for update in tour: `, payload);
+    console.log("payload recied for updating tour by req: ", payload);
+    
     const updatedNewdTour = await tourServices.updateTour(id, payload);
     sendResponse(res, {
       statusCode: StatusCodes.OK,
