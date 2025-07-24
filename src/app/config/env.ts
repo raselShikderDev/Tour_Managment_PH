@@ -5,7 +5,7 @@ dotenv.config();
 
 interface IEnvVars {
   MONGO_URI: string;
-  PORT: string; // In video it defined as string in the last video of module 25
+  PORT: string; 
   NODE_ENV: "Development" | "Production";
   JWT_ACCESS_EXPIRES: string;
   JWT_ACCESS_SECRET: string;
@@ -19,10 +19,6 @@ interface IEnvVars {
   GOOGLE_CALLBACK_URL: string;
   FRONEND_URL: string;
   EXPRESS_SESSION_SECRET: string;
-  CLOUDINARY_URL: string;
-  CLOUDINARY_API_SECRET: string;
-  CLOUDINARY_API_KEY: string;
-  CLOUDINARY_NAME: string;
   SSL: {
     SSL_VALIDATION_API: string;
     SSL_PAYMENT_API: string;
@@ -34,6 +30,12 @@ interface IEnvVars {
     SSL_SUCCESS_FRONTEND_URL: string;
     SSL_FAIL_FRONTEND_URL: string;
     SSL_CANCEL_FRONTEND_URL: string;
+  };
+  CLOUDINARY: {
+    CLOUDINARY_URL: string;
+    CLOUDINARY_API_SECRET: string;
+    CLOUDINARY_API_KEY: string;
+    CLOUDINARY_NAME: string;
   };
 }
 
@@ -90,10 +92,6 @@ const loadEnvVariables = () => {
     GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL,
     EXPRESS_SESSION_SECRET: process.env.EXPRESS_SESSION_SECRET,
     FRONEND_URL: process.env.FRONEND_URL,
-    CLOUDINARY_URL: process.env.CLOUDINARY_URL,
-    CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
-    CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
-    CLOUDINARY_NAME: process.env.CLOUDINARY_NAME,
     SSL: {
       SSL_VALIDATION_API: process.env.SSL_VALIDATION_API,
       SSL_PAYMENT_API: process.env.SSL_PAYMENT_API,
@@ -105,6 +103,12 @@ const loadEnvVariables = () => {
       SSL_SUCCESS_FRONTEND_URL: process.env.SSL_SUCCESS_FRONTEND_URL,
       SSL_FAIL_FRONTEND_URL: process.env.SSL_FAIL_FRONTEND_URL,
       SSL_CANCEL_FRONTEND_URL: process.env.SSL_CANCEL_FRONTEND_URL,
+    },
+    CLOUDINARY: {
+      CLOUDINARY_URL: process.env.CLOUDINARY_URL,
+      CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
+      CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
+      CLOUDINARY_NAME: process.env.CLOUDINARY_NAME,
     },
   };
 };
