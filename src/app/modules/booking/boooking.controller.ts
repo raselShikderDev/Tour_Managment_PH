@@ -16,7 +16,7 @@ const createBooking = catchAsync(
     const payload = req.body;
     const decodedToken = req.user as JwtPayload
    // eslint-disable-next-line no-console
-   console.log(`User from req: ${req.user}`)
+  //  console.log(`User from req: ${req.user}`)
    const bookings = await bookingServices.createBooking(payload, decodedToken.userId)
 
     sendResponse(res, {

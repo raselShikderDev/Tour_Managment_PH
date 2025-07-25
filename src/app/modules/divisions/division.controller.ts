@@ -14,6 +14,11 @@ import { divisionModel } from "./division.model";
 // Creating divisions
 const CreateDivision = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
+    console.log({
+      file:req.file,
+      body:req.body
+    });
+    
     const division: IDvision = await divisionServices.createDivision(req.body);
     if (!division)
       throw new appError(StatusCodes.BAD_GATEWAY, "Somthing went wrong");
@@ -21,7 +26,7 @@ const CreateDivision = catchAsync(
       statusCode: StatusCodes.CREATED,
       success: true,
       message: "Divison successfully created ",
-      data: division,
+      data: {}, /**division */
     });
   }
 );

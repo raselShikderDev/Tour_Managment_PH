@@ -33,20 +33,26 @@ const createBooking = async (payload: Partial<Ibooking>, userId: string) => {
       );
     }
 
-    const tourCost = await tourModel.findById(payload.tour).select("costForm");
-    if (!tourCost || typeof tourCost.costForm !== "number") {
-  throw new appError(StatusCodes.BAD_REQUEST, "No valid cost found for this tour");
-}
-    console.log("tourCost: ", tourCost);
-    
-    if (!tourCost) {
+    const tour = await tourModel.findById(payload.tour).select("costForm");
+
+    if (!tour || typeof tour.costForm !== "number") {
+      throw new appError(
+        StatusCodes.BAD_REQUEST,
+        "No valid cost found for this tour"
+      );
+    }
+    if (!tour) {
       throw new appError(StatusCodes.BAD_REQUEST, "No tour cost found");
     }
 
-    const amount = Number(tourCost) * Number(payload.guestCount);
+    // console.log("tourCost: ", tour.costForm);
+
+    // console.log("payload.guestCount: ", payload.guestCount);
+
+    const amount = Number(tour.costForm) * Number(payload.guestCount);
+    // console.log(`Amount: ${amount}`);
 
     const transId = GenerateTransactionId(userId);
-
     const booking = await bookingModel.create(
       [
         {
@@ -58,13 +64,23 @@ const createBooking = async (payload: Partial<Ibooking>, userId: string) => {
       { session }
     );
 
-    const payment = await paymentModel.create(
-      {
+    // console.log(`booking id: ${booking[0]._id}`);
+    // console.log(`transactionId,: ${transId}`);
+    
+    console.log(      {
         booking: booking[0]._id,
         status: PAYMENT_STATUS.UNPAID,
         transactionId: transId,
         amount: amount,
-      },
+      });
+    
+    const payment = await paymentModel.create(
+      [{
+        booking: booking[0]._id,
+        status: PAYMENT_STATUS.UNPAID,
+        transactionId: transId,
+        amount: amount,
+      }],
       { session }
     );
 
@@ -74,9 +90,9 @@ const createBooking = async (payload: Partial<Ibooking>, userId: string) => {
         { payment: payment[0]._id },
         { new: true, runValidators: true, session }
       )
-      .populate("Users", "name email phone address")
-      .populate("Tour", "title costForm")
-      .populate("Payments");
+      .populate("user", "name email phone address")
+      .populate("tour", "title costForm")
+      .populate("payment");
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const userEmail = (updatedBooking?.user as any).email;
@@ -88,7 +104,7 @@ const createBooking = async (payload: Partial<Ibooking>, userId: string) => {
     const userPhone = (updatedBooking?.user as any).phoneNumber;
 
     const sslPaylaod: ISSLCommerz = {
-      amount: amount,
+      amount: Number(amount),
       transactionId: transId,
       name: userName,
       email: userEmail,
@@ -114,7 +130,6 @@ const createBooking = async (payload: Partial<Ibooking>, userId: string) => {
 
 // Retriving all tours
 const getAllBooking = async () => {
- 
   return {
     meta: {
       total: null,
@@ -126,7 +141,7 @@ const getAllBooking = async () => {
 // Get singel a Booking by id
 const getSingelBooking = async (id: string) => {
   const Booking = null;
-  
+
   return Booking;
 };
 
