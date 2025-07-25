@@ -10,6 +10,7 @@ import { isActive } from "../modules/users/user.interface";
 export const checkAuth =
   (...authRoles: string[]) =>
   async (req: Request, res: Response, next: NextFunction) => {
+    // eslint-disable-next-line no-console
     console.log(`Got reqest in checkauth - req.body: `, req.body);
     
     try {

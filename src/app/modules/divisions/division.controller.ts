@@ -14,14 +14,6 @@ import { divisionModel } from "./division.model";
 // Creating divisions
 const CreateDivision = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-
-    // if (req.body.data && typeof req.body.data === 'string') {
-    //   try {
-    //     req.body = JSON.parse(req.body.data); 
-    //   } catch (e) {
-    //     throw new appError(StatusCodes.BAD_REQUEST, "Invalid JSON data in 'data' field");
-    //   }
-    // } 
         
     console.log({
       file:req.file,
