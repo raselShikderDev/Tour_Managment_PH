@@ -63,16 +63,6 @@ const createBooking = async (payload: Partial<Ibooking>, userId: string) => {
       ],
       { session }
     );
-
-    // console.log(`booking id: ${booking[0]._id}`);
-    // console.log(`transactionId,: ${transId}`);
-    
-    console.log(      {
-        booking: booking[0]._id,
-        status: PAYMENT_STATUS.UNPAID,
-        transactionId: transId,
-        amount: amount,
-      });
     
     const payment = await paymentModel.create(
       [{
@@ -113,6 +103,8 @@ const createBooking = async (payload: Partial<Ibooking>, userId: string) => {
     };
 
     const sslPayment = await sslServicess.sslPaymentInit(sslPaylaod);
+    console.log("sslPayment: ", sslPayment);
+    
 
     session.commitTransaction();
     session.endSession();

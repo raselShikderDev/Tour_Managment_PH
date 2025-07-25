@@ -14,19 +14,32 @@ import { divisionModel } from "./division.model";
 // Creating divisions
 const CreateDivision = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
+
+    // if (req.body.data && typeof req.body.data === 'string') {
+    //   try {
+    //     req.body = JSON.parse(req.body.data); 
+    //   } catch (e) {
+    //     throw new appError(StatusCodes.BAD_REQUEST, "Invalid JSON data in 'data' field");
+    //   }
+    // } 
+        
     console.log({
       file:req.file,
       body:req.body
     });
-    
-    const division: IDvision = await divisionServices.createDivision(req.body);
+
+    const payload :IDvision = {
+      ...req.body,
+      thumbnail:req.file?.path
+    }
+    const division: IDvision = await divisionServices.createDivision(payload);
     if (!division)
       throw new appError(StatusCodes.BAD_GATEWAY, "Somthing went wrong");
     sendResponse(res, {
       statusCode: StatusCodes.CREATED,
       success: true,
       message: "Divison successfully created ",
-      data: {}, /**division */
+      data: division,
     });
   }
 );
