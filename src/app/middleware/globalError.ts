@@ -4,6 +4,7 @@ import { NextFunction, Request, Response } from "express";
 import { envVars } from "../config/env";
 import appError from "../errorHelper/appError";
 import mongoose from "mongoose";
+import { deleteImageFromCloudinary } from "../config/cloudinary.config";
 
 interface TErrorSource {
   path: string;
@@ -80,7 +81,7 @@ const handleZodError = (err: any): TResponse => {
 /** Zod Error can appear as error
  */
 
-export const globalError = (
+export const globalError = async (
   err: any,
   req: Request,
   res: Response,
@@ -88,6 +89,17 @@ export const globalError = (
 ) => {
   let statusCode = 500;
   let message = `Somthing went wrong: ${err.message}`;
+
+  // delete singel image from cludianry - (req.file)
+  if(req.file){
+    await deleteImageFromCloudinary(req.file.path)
+  }
+
+  // deleting multiple image from cloudinary - (req.files)
+  if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+    const imagesUrl = (req.files as Express.Multer.File[]).map((file)=> file.path)
+    await Promise.all(imagesUrl.map((url)=> deleteImageFromCloudinary(url)))
+  }
 
   // Cast Error / Object id error
   if (err.name === "CastError") {
