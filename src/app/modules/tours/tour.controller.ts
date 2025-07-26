@@ -8,6 +8,7 @@ import { StatusCodes } from "http-status-codes";
 import appError from "../../errorHelper/appError";
 import { envVars } from "../../config/env";
 import mongoose from "mongoose";
+import { ITour } from "./tour.interface";
 
 /**--------------------------- Tour types Controller -------------------------- */
 //Creating tourType
@@ -108,7 +109,12 @@ export const tourTypeController = {
 //Creating tour
 const createTour = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const payload = req.body;
+
+     const payload:ITour = {
+      ...req.body,
+      images:(req.files as Express.Multer.File[]).map((file)=>file.path)
+    }
+    
     const newTour = await tourServices.createTour(payload);
     if (!newTour) {
       throw new appError(StatusCodes.BAD_GATEWAY, "Somthing went wrong");
@@ -118,7 +124,7 @@ const createTour = catchAsync(
       statusCode: StatusCodes.CREATED,
       success: true,
       message: "Tour successfully created ",
-      data: newTour,
+      data:newTour,
     });
   }
 );
@@ -183,7 +189,7 @@ const updateTour = catchAsync(
       throw new appError(StatusCodes.BAD_REQUEST, "Tour id is not valid");
     }
     const payload = req.body;
-    console.log("payload recied for updating tour by req: ", payload);
+    console.log("payload recevied for updating tour by req: ", payload);
     
     const updatedNewdTour = await tourServices.updateTour(id, payload);
     sendResponse(res, {

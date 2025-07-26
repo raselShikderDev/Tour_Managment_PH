@@ -8,6 +8,9 @@ import {
 } from "./tour.zodValidation";
 import { checkAuth } from "../../middleware/checkAuth";
 import { role } from "../users/user.interface";
+import { multerUpload } from "../../config/multer.config";
+
+
 const router = Router();
 
 
@@ -49,6 +52,7 @@ router.patch(
 // Create a tour
 router.post(
   "/create",
+  multerUpload.array("files"),
   checkAuth(role.ADMIN, role.SUPER_ADMIN),
   validateRequest(createTourZodSchema),
   tourController.createTour
