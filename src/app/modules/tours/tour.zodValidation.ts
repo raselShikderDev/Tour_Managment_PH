@@ -63,8 +63,9 @@ export const updateTourZodSchema = z.object({
     minAge: z.number({
         invalid_type_error: "Min age must be a number"
     }).int("Min age must be an integer").positive("Min age must be a positive number").optional(),
-    tourType: z.string().optional(), // Tour type can be updated
-    division: z.string().optional(), // Division can be updated
+    tourType: z.string().optional(), 
+    division: z.string().optional(),
+    deleteImages: z.array(z.string()).optional()
 });
 
 

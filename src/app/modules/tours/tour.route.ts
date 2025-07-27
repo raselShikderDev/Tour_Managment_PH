@@ -75,6 +75,7 @@ router.delete(
 // Update a tour
 router.patch(
   "/:id",
+  multerUpload.array("files"),
   checkAuth(role.ADMIN, role.SUPER_ADMIN),
   validateRequest(updateTourZodSchema),
   tourController.updateTour

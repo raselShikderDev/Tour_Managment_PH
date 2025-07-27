@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express";
 import catchAsync from "../../utils/catchAsync";
@@ -14,11 +13,6 @@ import { divisionModel } from "./division.model";
 // Creating divisions
 const CreateDivision = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-        
-    console.log({
-      file:req.file,
-      body:req.body
-    });
 
     const payload :IDvision = {
       ...req.body,
@@ -84,12 +78,14 @@ const deleteDivision = catchAsync(async (req: Request, res: Response, next: Next
 // Updating a divion
 const updateDivision = catchAsync(async (req: Request, res: Response, next: NextFunction) =>{
     const id = req.params.id
-        console.log(`Request for updating division id: ${id}`);
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
         throw new appError(StatusCodes.BAD_REQUEST, "Division id is not valid")
     }
-    const payload = req.body
+     const payload :IDvision = {
+      ...req.body,
+      thumbnail:req.file?.path
+    }
     const updatedNewdDivision = await divisionServices.updateDivision(id, payload)
     sendResponse(res, {
       statusCode: StatusCodes.OK,

@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express";
 import catchAsync from "../../utils/catchAsync";
@@ -188,8 +187,10 @@ const updateTour = catchAsync(
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new appError(StatusCodes.BAD_REQUEST, "Tour id is not valid");
     }
-    const payload = req.body;
-    console.log("payload recevied for updating tour by req: ", payload);
+    const payload:ITour = {
+      ...req.body,
+      images:(req.files as Express.Multer.File[]).map((file)=>file.path)
+  }
     
     const updatedNewdTour = await tourServices.updateTour(id, payload);
     sendResponse(res, {

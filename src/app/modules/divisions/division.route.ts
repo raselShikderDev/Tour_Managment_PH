@@ -11,12 +11,13 @@ import { multerUpload } from "../../config/multer.config";
 
 const router = Router();
 
-// router.post(
-//   "/create",
-//   multerUpload.single("file"),
-//   divisionController.CreateDivision
-// );
-router.post("/create", multerUpload.single("file"), checkAuth(role.ADMIN, role.SUPER_ADMIN),validateRequest(createDivisionZodValidation), divisionController.CreateDivision)
+router.post(
+  "/create",
+  multerUpload.single("file"),
+  checkAuth(role.ADMIN, role.SUPER_ADMIN),
+  validateRequest(createDivisionZodValidation),
+  divisionController.CreateDivision
+);
 router.get(
   "/",
   checkAuth(role.ADMIN, role.SUPER_ADMIN),
@@ -34,6 +35,7 @@ router.delete(
 );
 router.patch(
   "/:id",
+  multerUpload.single("file"),
   checkAuth(role.ADMIN, role.SUPER_ADMIN),
   validateRequest(updateDivisionZodValidation),
   divisionController.updateDivision
