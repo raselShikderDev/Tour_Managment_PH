@@ -25,4 +25,5 @@ export interface ITour{
     maxGuest?:number,
     minAge?:number,
     division:Types.ObjectId,
+    deleteImages?:string[],
 }

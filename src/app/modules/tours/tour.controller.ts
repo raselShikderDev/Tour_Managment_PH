@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express";
 import catchAsync from "../../utils/catchAsync";
@@ -8,6 +7,7 @@ import { StatusCodes } from "http-status-codes";
 import appError from "../../errorHelper/appError";
 import { envVars } from "../../config/env";
 import mongoose from "mongoose";
+import { ITour } from "./tour.interface";
 
 /**--------------------------- Tour types Controller -------------------------- */
 //Creating tourType
@@ -37,6 +37,23 @@ const getAllTourType = catchAsync(
       success: true,
       message: "Successfully retrived TourType",
       data: allTourType,
+    });
+  }
+);
+
+//Retriving all TourType
+const getSingelTourType = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new appError(StatusCodes.BAD_REQUEST, "TourType id is not valid");
+    }
+    const TourType = await tourTypeServices.getSingelTourType(id);
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Successfully retrived TourType",
+      data: TourType,
     });
   }
 );
@@ -84,13 +101,19 @@ export const tourTypeController = {
   getAllTourType,
   deleteTourType,
   updateTourType,
+  getSingelTourType,
 };
 
 /**------------------------------ Tour Controller -------------------------------- */
 //Creating tour
 const createTour = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const payload = req.body;
+
+     const payload:ITour = {
+      ...req.body,
+      images:(req.files as Express.Multer.File[]).map((file)=>file.path)
+    }
+    
     const newTour = await tourServices.createTour(payload);
     if (!newTour) {
       throw new appError(StatusCodes.BAD_GATEWAY, "Somthing went wrong");
@@ -100,7 +123,7 @@ const createTour = catchAsync(
       statusCode: StatusCodes.CREATED,
       success: true,
       message: "Tour successfully created ",
-      data: newTour,
+      data:newTour,
     });
   }
 );
@@ -164,8 +187,11 @@ const updateTour = catchAsync(
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new appError(StatusCodes.BAD_REQUEST, "Tour id is not valid");
     }
-    const payload = req.body;
-    console.log(`Requested for update in tour: `, payload);
+    const payload:ITour = {
+      ...req.body,
+      images:(req.files as Express.Multer.File[]).map((file)=>file.path)
+  }
+    
     const updatedNewdTour = await tourServices.updateTour(id, payload);
     sendResponse(res, {
       statusCode: StatusCodes.OK,

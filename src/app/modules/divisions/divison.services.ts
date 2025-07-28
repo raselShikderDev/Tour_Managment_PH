@@ -1,7 +1,9 @@
+/* eslint-disable no-console */
 import { StatusCodes } from "http-status-codes";
 import appError from "../../errorHelper/appError";
 import { IDvision } from "./division.interface";
 import { divisionModel } from "./division.model";
+import { deleteImageFromCloudinary } from "../../config/cloudinary.config";
 
 // Creating Division
 const createDivision = async (payload: IDvision) => {
@@ -36,7 +38,6 @@ const getSingelDivision = async (slug:string)=>{
 // Getting all divisions
 const getAllDivisions = async () => {
   const allDivisions = await divisionModel.find();
-  // eslint-disable-next-line no-console
   console.log("No Division created yet");
   return allDivisions;
 };
@@ -51,14 +52,8 @@ const deleteDivision = async (id: string) => {
 
 // Updating Division
 const updateDivision = async (id: string, payload: Partial<IDvision>) => {
-  if (!payload)
-    throw new appError(
-      StatusCodes.NOT_FOUND,
-      "Division's updated infromation not found"
-    );
-
-  const isExist = await divisionModel.findById(id);
-  if (!isExist) {
+  const existingDivision = await divisionModel.findById(id);
+  if (!existingDivision) {
     throw new appError(StatusCodes.NOT_FOUND, "Division not found");
   }
 
@@ -91,9 +86,15 @@ const updateDivision = async (id: string, payload: Partial<IDvision>) => {
     payload,
     { new: true, runValidators: true }
   );
+
   if (!updatedNewDivision) {
     throw new appError(StatusCodes.NOT_FOUND, "Division not found");
   }
+
+  if (payload.thumbnail && existingDivision.thumbnail) {
+    await deleteImageFromCloudinary(existingDivision.thumbnail)
+  }
+
   return updatedNewDivision;
 };
 

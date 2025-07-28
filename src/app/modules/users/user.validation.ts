@@ -58,9 +58,3 @@ export const updateUserZodValidation =  z.object({
   isVerified:z.boolean({invalid_type_error:"isVerified must a boolean"}).optional(),
 });
 
-export const paramsSchema = z.object({
-  id: z
-    .string()
-    .length(24, { message: "Invalid ObjectId length" })
-    .regex(/^[a-fA-F0-9]+$/, { message: "Invalid ObjectId format" }),
-});
