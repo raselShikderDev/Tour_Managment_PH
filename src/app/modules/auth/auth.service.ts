@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import appError from "../../errorHelper/appError";
-import { IUser } from "../users/user.interface";
+import { IAuthProvider, IUser } from "../users/user.interface";
 import { userModel } from "../users/user.model";
 import bcrypt from "bcrypt";
 import { createUserToken } from "../../utils/userTokens";
@@ -113,8 +113,46 @@ const resetPassword = async (
   user.save();
 };
 
+// chaning user password 
+const chnagePassword = async () => {
+
+  return {}
+};
+
+// setting user password 
+const setPassword = async (decodedToken:JwtPayload, plainPassword:string) => {
+
+const user = await userModel.findById(decodedToken.id)
+if(!user){
+  throw new appError(StatusCodes.NOT_FOUND, "User not found")
+}
+
+if (user.password && user.auths.some((authprovider)=> authprovider.provider == "google")) {
+  throw new appError(StatusCodes.BAD_REQUEST, "You have already set your password. Now you can chnage your password")
+}
+
+const hashedpassword = await bcrypt.hash(plainPassword, Number(envVars.BCRYPT_SALT_ROUND as string))
+
+const credentialsProvider:IAuthProvider ={
+  provider:"Credentials",
+  providerId:user.email
+}
+
+const auth:IAuthProvider[] = [...user.auths, credentialsProvider]
+
+user.password = hashedpassword
+user.auths = auth
+user.save()
+
+  return{}
+};
+
+//user - login - token (email, role, _id) - booking / payment / booking / payment cancel - token
+
 export const authServices = {
   credentialsLogin,
   newAccessToken,
   resetPassword,
+  chnagePassword,
+  setPassword,
 };

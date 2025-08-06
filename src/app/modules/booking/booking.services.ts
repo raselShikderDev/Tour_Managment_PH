@@ -11,13 +11,9 @@ import { paymentModel } from "../payment/payment.model";
 import { PAYMENT_STATUS } from "../payment/payment.interfce";
 import { sslServicess } from "../sslcommerz/sslcommerce.service";
 import { ISSLCommerz } from "../sslcommerz/sslcommerce.interface";
+import { generateTransactionId } from "../../utils/getTransaction";
 
-// Generating Transaction id with mixture of current date userId and random Number
-const GenerateTransactionId = (id: string): string => {
-  return `trans_${Date.now()}_${Math.floor(Math.random() * 1000)}_${id.slice(
-    18
-  )}`;
-};
+
 
 // Creating Booking
 const createBooking = async (payload: Partial<Ibooking>, userId: string) => {
@@ -52,7 +48,7 @@ const createBooking = async (payload: Partial<Ibooking>, userId: string) => {
     const amount = Number(tour.costForm) * Number(payload.guestCount);
     // console.log(`Amount: ${amount}`);
 
-    const transId = GenerateTransactionId(userId);
+    const transId = generateTransactionId(userId);
     const booking = await bookingModel.create(
       [
         {

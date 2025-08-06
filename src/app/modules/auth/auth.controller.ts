@@ -149,10 +149,43 @@ const googleCallback = catchAsync(async (req: Request, res: Response, next: Next
   res.redirect(`${envVars.FRONEND_URL as string}/${redirect}`)
 })
 
+
+// chnage user password
+const chnagePassword = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Password successfully chnaged",
+      data: null,
+    });
+  }
+);
+
+// chnage user password
+const setPassword = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const newPassword = req.body.newPassword;
+    const decodedToken = req.user;
+
+    await authServices.setPassword(decodedToken as JwtPayload, newPassword);
+
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Password successfully set",
+      data: null,
+    });
+  }
+);
+
 export const authController = {
   credentialsLogin,
   getNewAccessToken,
   logoutUser,
   resetPassword,
   googleCallback,
+  chnagePassword,
+  setPassword,
 };
