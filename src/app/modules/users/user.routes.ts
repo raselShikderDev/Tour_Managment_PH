@@ -16,6 +16,9 @@ router.get(
   userCcontroller.getAllUsers
 );
 
+// Get current user
+router.get("/me", checkAuth(...Object.values(role)), userCcontroller.getMe)
+
 // user register route
 router.post(
   "/register",
@@ -33,6 +36,7 @@ router.delete("/:userId", checkAuth(role.ADMIN, role.SUPER_ADMIN), userCcontroll
 // Get singel user
 router.get("/:userId", checkAuth(role.ADMIN, role.SUPER_ADMIN), userCcontroller.getSingelUser)
 
-//
+
+
 
 export const userRoutes = router;

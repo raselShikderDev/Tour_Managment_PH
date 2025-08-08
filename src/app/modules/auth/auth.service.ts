@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import appError from "../../errorHelper/appError";
-import { IAuthProvider, IUser } from "../users/user.interface";
+import { IAuthProvider, isActive, IUser } from "../users/user.interface";
 import { userModel } from "../users/user.model";
 import bcrypt from "bcrypt";
 import { createUserToken } from "../../utils/userTokens";
@@ -15,7 +15,23 @@ const credentialsLogin = async (payload: Partial<IUser>) => {
   const existedUser = await userModel.findOne({ email });
 
   if (!existedUser) throw new appError(StatusCodes.NOT_FOUND, "User not exist");
+  if(existedUser.isVerified === false){
+        throw new appError(StatusCodes.FORBIDDEN, "User is not verified");
+      }
 
+      if (
+        existedUser.isActive === isActive.INACTIVE ||
+        existedUser.isActive === isActive.BLOCKED
+      ) {
+        throw new appError(
+          StatusCodes.UNAUTHORIZED,
+          `User is ${existedUser.isActive}`
+        );
+      }
+
+      if (existedUser.isDeleted === true) {
+        throw new appError(StatusCodes.UNAUTHORIZED, `User is deleted already`);
+      }
   const isLoggedIn = await bcrypt.compare(
     password as string,
     existedUser.password as string

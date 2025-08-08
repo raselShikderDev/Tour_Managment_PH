@@ -29,8 +29,8 @@ const getAllUsers = catchAsync(
       success: true,
       message: "All users retrived successfully",
       data: result.data,
-      meta: {
-          total: result.meta, 
+      meta:{
+        total:result.meta
       },
     });
   }
@@ -116,7 +116,6 @@ const deleteUser = catchAsync(async( req: Request, res: Response, next: NextFunc
 const getSingelUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.userId;
-    console.log(`User id reqestd: ${id}`);
     
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new appError(StatusCodes.BAD_REQUEST, "User id is not valid");
@@ -126,6 +125,25 @@ const getSingelUser = catchAsync(
       statusCode: StatusCodes.OK,
       success: true,
       message: "Successfully retrived a user",
+      data: user,
+    });
+  }
+);
+
+
+// Retriveve current user data
+const getMe = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.userId;
+    
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new appError(StatusCodes.BAD_REQUEST, "User id is not valid");
+    }
+   const user = await userServices.getSingelUser(id);
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Successfully retrived current user profile",
       data: user,
     });
   }
@@ -160,5 +178,6 @@ export const userCcontroller = {
   getAllUsers,
   updateUser,
   deleteUser,
-  getSingelUser
+  getSingelUser,
+  getMe,
 };

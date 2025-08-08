@@ -17,7 +17,7 @@ const startServer = async () => {
 
     server = app.listen(envVars.PORT, () => {
         if (envVars.NODE_ENV === "Development") {
-        console.log(`Server is running at port ${envVars.PORT} http://localhost:${envVars.PORT}`);
+        console.log(`Server is running at http://localhost:${envVars.PORT}`);
     }
     });
   } catch (error) {

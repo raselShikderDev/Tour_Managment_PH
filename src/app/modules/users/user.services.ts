@@ -100,10 +100,18 @@ const deleteuser = async (userid:string)=>{
   return deletedUser
 }
 
+// Get my profile's information
+const getMe = async (id:string)=>{
+  const user = await userModel.findById(id);
+  if (user === null) throw new appError(StatusCodes.NOT_FOUND, "Your profile's information not found");
+  return user;
+};
+
 export const userServices = {
   createUser,
   getAllUser,
   updateUser,
   deleteuser,
   getSingelUser,
+  getMe,
 };

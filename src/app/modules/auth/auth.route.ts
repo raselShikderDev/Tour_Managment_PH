@@ -3,6 +3,7 @@ import { authController } from "./auth.controller";
 import { checkAuth } from "../../middleware/checkAuth";
 import { role } from "../users/user.interface";
 import passport from "passport";
+import { envVars } from "../../config/env";
 
 const router = Router()
 
@@ -16,7 +17,7 @@ router.get("/google", async(req:Request, res:Response, next:NextFunction)=>{
     const redirect = req.query.state as string || "/"
     passport.authenticate("google", {scope:["profile", "email"], state:redirect as string})(req, res, next)
 })
-router.get("/google/callback",passport.authenticate("google", {failureRedirect:"/login"}), authController.googleCallback)
+router.get("/google/callback",passport.authenticate("google", {failureRedirect:`${envVars.FRONEND_URL}/login?error=`}), authController.googleCallback)
 
 
 export const authRoutes = router

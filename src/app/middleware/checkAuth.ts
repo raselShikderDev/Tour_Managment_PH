@@ -30,8 +30,8 @@ export const checkAuth =
       if (!userExist)
         throw new appError(StatusCodes.NOT_FOUND, "User not found");
 
-      if (userExist.isDeleted === true) {
-        throw new appError(StatusCodes.BAD_REQUEST, `User is deleted already`);
+      if(userExist.isVerified === false){
+        throw new appError(StatusCodes.NOT_FOUND, "User is not verified");
       }
 
       if (
@@ -42,6 +42,10 @@ export const checkAuth =
           StatusCodes.BAD_REQUEST,
           `User is ${userExist.isActive}`
         );
+      }
+
+      if (userExist.isDeleted === true) {
+        throw new appError(StatusCodes.BAD_REQUEST, `User is deleted already`);
       }
 
       req.user = verifiedToekn;
