@@ -40,7 +40,7 @@ const credentialsLogin = async (payload: Partial<IUser>) => {
     password as string,
     existedUser.password as string
   );
-    console.log(`passMatch in auth login: ${isLoggedIn}`);
+  console.log(`passMatch in auth login: ${isLoggedIn}`);
   if (!isLoggedIn)
     throw new appError(StatusCodes.BAD_REQUEST, "Invalid Password");
 
@@ -234,7 +234,6 @@ const resetPassword = async (
   if (!isUserExist) {
     throw new appError(401, "User does not exist");
   }
-  const prevPassword = isUserExist.password;
 
   isUserExist.password = await bcrypt.hash(
     payload.newPassword,
@@ -242,25 +241,8 @@ const resetPassword = async (
   );
 
   await isUserExist.save();
-  const newPass = isUserExist.password;
 
-  const passMatch = await bcrypt.compare(
-    payload.newPassword,
-    isUserExist.password as string
-  );
-  console.log(`passMatch: ${passMatch}`);
-  
-  if (!passMatch) {
-    throw new appError(
-      401,
-      "Requested new password to updated and Updated database password checked and and mismatch, Means new password resetting is faild"
-    );
-  }
-
-  return {
-    prevPassword,
-    newPass,
-  };
+  return true;
 };
 
 //user - login - token (email, role, _id) - booking / payment / booking / payment cancel - token

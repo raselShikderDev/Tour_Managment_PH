@@ -15,7 +15,7 @@ import passport from "passport";
 // Login by Passport credentials athentication and giving a access token to user API
 const credentialsLogin = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-      console.log("Recevif losign request in controller", req.body);
+    console.log("Recevif losign request in controller", req.body);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     passport.authenticate("local", async (err: any, user: any, info: any) => {
       // if(err) next(err)
@@ -182,28 +182,25 @@ const setPassword = catchAsync(
 const resetPassword = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const decodedToken = req.user;
-  console.log("In auth controller req.body:", req.body)
 
-
-  console.log("In auth controller decodedToken:", decodedToken)
+    console.log("In auth controller decodedToken:", decodedToken);
     const data = await authServices.resetPassword(
       req.body,
       decodedToken as JwtPayload
     );
 
-    if (!data.newPass || !data.prevPassword) {
+    if (!data) {
       throw new appError(
         StatusCodes.BAD_REQUEST,
         "new pass and old pass not found"
       );
     }
 
-
     sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,
       message: "Password successfully reset",
-      data: data,
+      data: null,
     });
   }
 );
@@ -212,8 +209,7 @@ const resetPassword = catchAsync(
 const forgotPassword = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const email = req.body.email;
-    console.log("recived forgot passowrd request", );
-    
+
     const data = await authServices.forgotPassword(email);
     if (!data) {
       throw new appError(
@@ -224,7 +220,7 @@ const forgotPassword = catchAsync(
     sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,
-      message: "Password reset link sent to email",
+      message: "Password reset link sent to user email",
       data: null,
     });
   }
