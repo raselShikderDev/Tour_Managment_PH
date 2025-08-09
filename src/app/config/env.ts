@@ -5,7 +5,7 @@ dotenv.config();
 
 interface IEnvVars {
   MONGO_URI: string;
-  PORT: string; 
+  PORT: string;
   NODE_ENV: "Development" | "Production";
   JWT_ACCESS_EXPIRES: string;
   JWT_ACCESS_SECRET: string;
@@ -19,6 +19,11 @@ interface IEnvVars {
   GOOGLE_CALLBACK_URL: string;
   FRONEND_URL: string;
   EXPRESS_SESSION_SECRET: string;
+  SMTP_HOST: string;
+  SMTP_FROM: string;
+  SMTP_PASS: string;
+  SMTP_USER: string;
+  SMTP_PORT: string;
   SSL: {
     SSL_VALIDATION_API: string;
     SSL_PAYMENT_API: string;
@@ -70,6 +75,11 @@ const loadEnvVariables = () => {
     "CLOUDINARY_API_SECRET",
     "CLOUDINARY_API_KEY",
     "CLOUDINARY_NAME",
+    "SMTP_HOST",
+    "SMTP_FROM",
+    "SMTP_PASS",
+    "SMTP_PORT",
+    "SMTP_USER",
   ];
   requiredEnv.forEach((elem) => {
     if (!process.env[elem]) {
@@ -92,6 +102,11 @@ const loadEnvVariables = () => {
     GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL,
     EXPRESS_SESSION_SECRET: process.env.EXPRESS_SESSION_SECRET,
     FRONEND_URL: process.env.FRONEND_URL,
+    SMTP_HOST: process.env.SMTP_HOST,
+    SMTP_FROM: process.env.SMTP_FROM,
+    SMTP_PASS: process.env.SMTP_PASS,
+    SMTP_USER: process.env.SMTP_USER,
+    SMTP_PORT: process.env.SMTP_PORT,
     SSL: {
       SSL_VALIDATION_API: process.env.SSL_VALIDATION_API,
       SSL_PAYMENT_API: process.env.SSL_PAYMENT_API,

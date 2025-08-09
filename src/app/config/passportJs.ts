@@ -10,7 +10,6 @@ import { envVars } from "./env";
 import { userModel } from "../modules/users/user.model";
 import { isActive, role } from "../modules/users/user.interface";
 import bcrypt from "bcrypt";
-import { StatusCodes } from "http-status-codes";
 
 // For credenital authentication by passport
 passport.use(
@@ -24,25 +23,22 @@ passport.use(
         const existedUser = await userModel.findOne({ email });
 
         if (!existedUser) {
-          return done(null, false, { message: "User not exist" });
+         return done(null, false, { message: "User not exist" });
         }
 
         if (existedUser.isVerified === false) {
-          return done(StatusCodes.FORBIDDEN, "User is not verified");
+            return done(null, false, { message: "User is not verified" });
         }
 
         if (
           existedUser.isActive === isActive.INACTIVE ||
           existedUser.isActive === isActive.BLOCKED
         ) {
-          return done(
-            StatusCodes.UNAUTHORIZED,
-            `User is ${existedUser.isActive}`
-          );
+          return done(null, false, { message: `User is ${existedUser.isActive}` });
         }
 
         if (existedUser.isDeleted === true) {
-          return done(StatusCodes.UNAUTHORIZED, `User is deleted already`);
+            return done(null, false, { message: "User is deleted already" });
         }
 
         const isGoogleAthenticated = existedUser.auths.some(
@@ -53,9 +49,10 @@ passport.use(
         //   return done(null, false, {message:"You have athenticated through google, If you want to login through credential, then at first login with google and set a passowrd then you can be able to login with credentials"})
         // }
         if (isGoogleAthenticated && !existedUser.password) {
-          return done(
-            "You have athenticated through google, If you want to login through credential, then at first login with google and set a passowrd then you can be able to login with credentials"
-          );
+          return done(null, false, {
+            message:
+              "You have authenticated through Google. To log in with credentials, log in with Google first and set a password."
+          });
         }
 
         const hashedPassword = await bcrypt.compare(
@@ -108,7 +105,7 @@ passport.use(
               },
             ],
           });
-          existedUser.save();
+         await existedUser.save();
         }
         return done(null, existedUser);
       } catch (error) {

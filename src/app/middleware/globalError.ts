@@ -89,6 +89,9 @@ export const globalError = async (
 ) => {
   let statusCode = 500;
   let message = `Somthing went wrong: ${err.message}`;
+  // eslint-disable-next-line no-console
+  // console.log("err in global: ", err);
+  
 
   // delete singel image from cludianry - (req.file)
   if(req.file){
@@ -106,6 +109,8 @@ export const globalError = async (
     const simplifyError = handleCastError(err);
     statusCode = simplifyError.statusCode;
     message = simplifyError.message;
+    // console.log("Cast error in global", err);
+    
   }
   // Duplicate Error
   else if (err.code === 1000) {

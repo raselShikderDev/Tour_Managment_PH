@@ -1,12 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-console */
 import { StatusCodes } from "http-status-codes";
 import appError from "../../errorHelper/appError";
 import { IAuthProvider, isActive, IUser } from "../users/user.interface";
 import { userModel } from "../users/user.model";
 import bcrypt from "bcrypt";
+// import bcryptjs from "bcryptjs";
 import { createUserToken } from "../../utils/userTokens";
 import { createNewAccessTokenWithrefreshToken } from "../../utils/newAccessTokenWithrefreshToken";
-import { JwtPayload } from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { envVars } from "../../config/env";
+import { sendEmail } from "../../utils/sendEmail";
 
 // checking credential login info and creating user tokens
 const credentialsLogin = async (payload: Partial<IUser>) => {
@@ -15,27 +19,28 @@ const credentialsLogin = async (payload: Partial<IUser>) => {
   const existedUser = await userModel.findOne({ email });
 
   if (!existedUser) throw new appError(StatusCodes.NOT_FOUND, "User not exist");
-  if(existedUser.isVerified === false){
-        throw new appError(StatusCodes.FORBIDDEN, "User is not verified");
-      }
+  if (existedUser.isVerified === false) {
+    throw new appError(StatusCodes.FORBIDDEN, "User is not verified");
+  }
 
-      if (
-        existedUser.isActive === isActive.INACTIVE ||
-        existedUser.isActive === isActive.BLOCKED
-      ) {
-        throw new appError(
-          StatusCodes.UNAUTHORIZED,
-          `User is ${existedUser.isActive}`
-        );
-      }
+  if (
+    existedUser.isActive === isActive.INACTIVE ||
+    existedUser.isActive === isActive.BLOCKED
+  ) {
+    throw new appError(
+      StatusCodes.UNAUTHORIZED,
+      `User is ${existedUser.isActive}`
+    );
+  }
 
-      if (existedUser.isDeleted === true) {
-        throw new appError(StatusCodes.UNAUTHORIZED, `User is deleted already`);
-      }
+  if (existedUser.isDeleted === true) {
+    throw new appError(StatusCodes.UNAUTHORIZED, `User is deleted already`);
+  }
   const isLoggedIn = await bcrypt.compare(
     password as string,
     existedUser.password as string
   );
+    console.log(`passMatch in auth login: ${isLoggedIn}`);
   if (!isLoggedIn)
     throw new appError(StatusCodes.BAD_REQUEST, "Invalid Password");
 
@@ -103,13 +108,12 @@ const newAccessToken = async (refreshToen: string) => {
   };
 };
 
-// Reseting user password based on usertoken
-const resetPassword = async (
+// chaning user password based on user token in case of while user need to chnage password
+const chnagePassword = async (
   newPassword: string,
   oldPassword: string,
   decodedToken: JwtPayload
 ) => {
-
   const user = await userModel.findById(decodedToken.userId);
   if (!user) {
     throw new appError(StatusCodes.NOT_FOUND, "User not found");
@@ -126,41 +130,137 @@ const resetPassword = async (
     newPassword,
     Number(envVars.BCRYPT_SALT_ROUND)
   );
-  user.save();
+  await user.save();
+  return true;
 };
 
-// chaning user password 
-const chnagePassword = async () => {
+// setting user password while user register via google
+const setPassword = async (decodedToken: JwtPayload, plainPassword: string) => {
+  const user = await userModel.findById(decodedToken.id);
+  if (!user) {
+    throw new appError(StatusCodes.NOT_FOUND, "User not found");
+  }
 
-  return {}
+  if (
+    user.password &&
+    user.auths.some((authprovider) => authprovider.provider == "google")
+  ) {
+    throw new appError(
+      StatusCodes.BAD_REQUEST,
+      "You have already set your password. Now you can chnage your password"
+    );
+  }
+
+  const hashedpassword = await bcrypt.hash(
+    plainPassword,
+    Number(envVars.BCRYPT_SALT_ROUND as string)
+  );
+
+  const credentialsProvider: IAuthProvider = {
+    provider: "Credentials",
+    providerId: user.email,
+  };
+
+  const auth: IAuthProvider[] = [...user.auths, credentialsProvider];
+
+  user.password = hashedpassword;
+  user.auths = auth;
+  await user.save();
+
+  return {};
 };
 
-// setting user password 
-const setPassword = async (decodedToken:JwtPayload, plainPassword:string) => {
+// Sending forget password link to email to chnage user password
+const forgotPassword = async (email: string) => {
+  console.log("In service", email);
+  const existedUser = await userModel.findOne({ email });
+  console.log(existedUser);
 
-const user = await userModel.findById(decodedToken.id)
-if(!user){
-  throw new appError(StatusCodes.NOT_FOUND, "User not found")
-}
+  if (!existedUser) throw new appError(StatusCodes.NOT_FOUND, "User not exist");
+  if (existedUser.isVerified === false) {
+    throw new appError(StatusCodes.FORBIDDEN, "User is not verified");
+  }
 
-if (user.password && user.auths.some((authprovider)=> authprovider.provider == "google")) {
-  throw new appError(StatusCodes.BAD_REQUEST, "You have already set your password. Now you can chnage your password")
-}
+  if (
+    existedUser.isActive === isActive.INACTIVE ||
+    existedUser.isActive === isActive.BLOCKED
+  ) {
+    throw new appError(
+      StatusCodes.UNAUTHORIZED,
+      `User is ${existedUser.isActive}`
+    );
+  }
 
-const hashedpassword = await bcrypt.hash(plainPassword, Number(envVars.BCRYPT_SALT_ROUND as string))
+  if (existedUser.isDeleted === true) {
+    throw new appError(StatusCodes.UNAUTHORIZED, `User is deleted already`);
+  }
 
-const credentialsProvider:IAuthProvider ={
-  provider:"Credentials",
-  providerId:user.email
-}
+  const jwtPayload = {
+    user: existedUser._id,
+    email: existedUser.email,
+    role: existedUser.role,
+  };
 
-const auth:IAuthProvider[] = [...user.auths, credentialsProvider]
+  const resetToken = jwt.sign(jwtPayload, envVars.JWT_ACCESS_SECRET as string, {
+    expiresIn: "59m",
+  });
+  const resetUiLink = `${envVars.FRONEND_URL}/forgot-password?id=${existedUser._id}&resetToken=${resetToken}`;
 
-user.password = hashedpassword
-user.auths = auth
-user.save()
+  console.log(`resetToken ${resetToken}`);
+  console.log(`resetUiLink ${resetUiLink}`);
 
-  return{}
+  await sendEmail({
+    to: existedUser.email,
+    subject: "Password reset",
+    templateName: "forgetPassword",
+    templateData: {
+      name: existedUser.name,
+      resetUiLink,
+    },
+  });
+  return true;
+};
+
+// resetting user password via reset password link
+const resetPassword = async (
+  payload: Record<string, any>,
+  decodedToken: JwtPayload
+) => {
+  if (payload.id != decodedToken.user) {
+    throw new appError(401, "You can not reset your password");
+  }
+
+  const isUserExist = await userModel.findById(decodedToken.user);
+  if (!isUserExist) {
+    throw new appError(401, "User does not exist");
+  }
+  const prevPassword = isUserExist.password;
+
+  isUserExist.password = await bcrypt.hash(
+    payload.newPassword,
+    Number(envVars.BCRYPT_SALT_ROUND as string)
+  );
+
+  await isUserExist.save();
+  const newPass = isUserExist.password;
+
+  const passMatch = await bcrypt.compare(
+    payload.newPassword,
+    isUserExist.password as string
+  );
+  console.log(`passMatch: ${passMatch}`);
+  
+  if (!passMatch) {
+    throw new appError(
+      401,
+      "Requested new password to updated and Updated database password checked and and mismatch, Means new password resetting is faild"
+    );
+  }
+
+  return {
+    prevPassword,
+    newPass,
+  };
 };
 
 //user - login - token (email, role, _id) - booking / payment / booking / payment cancel - token
@@ -168,7 +268,8 @@ user.save()
 export const authServices = {
   credentialsLogin,
   newAccessToken,
-  resetPassword,
   chnagePassword,
   setPassword,
+  forgotPassword,
+  resetPassword,
 };

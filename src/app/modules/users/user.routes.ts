@@ -26,15 +26,16 @@ router.post(
   userCcontroller.createUser
 );
 
+// Get singel user
+router.get("/:userId", checkAuth(role.ADMIN, role.SUPER_ADMIN), userCcontroller.getSingelUser)
+
+
 // user update route
 router.patch("/:userId", validateRequest(updateUserZodValidation), checkAuth(...Object.values(role)), userCcontroller.updateUser);
 
 
 // Delete user
-router.delete("/:userId", checkAuth(role.ADMIN, role.SUPER_ADMIN), userCcontroller.getAllUsers)
-
-// Get singel user
-router.get("/:userId", checkAuth(role.ADMIN, role.SUPER_ADMIN), userCcontroller.getSingelUser)
+router.delete("/:userId", checkAuth(role.ADMIN, role.SUPER_ADMIN), userCcontroller.deleteUser)
 
 
 
