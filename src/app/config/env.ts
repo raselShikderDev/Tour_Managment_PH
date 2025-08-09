@@ -43,12 +43,10 @@ interface IEnvVars {
     CLOUDINARY_API_KEY: string;
     CLOUDINARY_NAME: string;
   };
-  REDIS:{
-      REDIS_PORT:string,
-      REDIS_HOST:string,
-      REDIS_PASS:string,
-      REDIS_USERNAME:string,
-    };
+  REDIS_HOST: string;
+  REDIS_PORT: string;
+  REDIS_USERNAME: string;
+  REDIS_PASSWORD: string;
 }
 
 const loadEnvVariables = () => {
@@ -87,10 +85,10 @@ const loadEnvVariables = () => {
     "SMTP_PASS",
     "SMTP_PORT",
     "SMTP_USER",
-    "REDIS_PORT",
     "REDIS_HOST",
-    "REDIS_PASS",
+    "REDIS_PORT",
     "REDIS_USERNAME",
+    "REDIS_PASSWORD",
   ];
   requiredEnv.forEach((elem) => {
     if (!process.env[elem]) {
@@ -136,12 +134,10 @@ const loadEnvVariables = () => {
       CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
       CLOUDINARY_NAME: process.env.CLOUDINARY_NAME,
     },
-    REDIS:{
-      REDIS_PORT:process.env.REDIS_PORT,
-      REDIS_HOST:process.env.REDIS_HOST,
-      REDIS_PASS:process.env.REDIS_PASS,
-      REDIS_USERNAME:process.env.REDIS_USERNAME,
-    }
+    REDIS_HOST: process.env.REDIS_HOST as string,
+    REDIS_PORT: process.env.REDIS_PORT as string,
+    REDIS_USERNAME: process.env.REDIS_USERNAME as string,
+    REDIS_PASSWORD: process.env.REDIS_PASSWORD as string,
   };
 };
 
