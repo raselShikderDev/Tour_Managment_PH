@@ -24,6 +24,7 @@ interface IEnvVars {
   SMTP_PASS: string;
   SMTP_USER: string;
   SMTP_PORT: string;
+
   SSL: {
     SSL_VALIDATION_API: string;
     SSL_PAYMENT_API: string;
@@ -42,6 +43,12 @@ interface IEnvVars {
     CLOUDINARY_API_KEY: string;
     CLOUDINARY_NAME: string;
   };
+  REDIS:{
+      REDIS_PORT:string,
+      REDIS_HOST:string,
+      REDIS_PASS:string,
+      REDIS_USERNAME:string,
+    };
 }
 
 const loadEnvVariables = () => {
@@ -80,6 +87,10 @@ const loadEnvVariables = () => {
     "SMTP_PASS",
     "SMTP_PORT",
     "SMTP_USER",
+    "REDIS_PORT",
+    "REDIS_HOST",
+    "REDIS_PASS",
+    "REDIS_USERNAME",
   ];
   requiredEnv.forEach((elem) => {
     if (!process.env[elem]) {
@@ -125,6 +136,12 @@ const loadEnvVariables = () => {
       CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
       CLOUDINARY_NAME: process.env.CLOUDINARY_NAME,
     },
+    REDIS:{
+      REDIS_PORT:process.env.REDIS_PORT,
+      REDIS_HOST:process.env.REDIS_HOST,
+      REDIS_PASS:process.env.REDIS_PASS,
+      REDIS_USERNAME:process.env.REDIS_USERNAME,
+    }
   };
 };
 
