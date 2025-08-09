@@ -172,11 +172,10 @@ const setPassword = async (decodedToken: JwtPayload, plainPassword: string) => {
 
 // Sending forget password link to email to chnage user password
 const forgotPassword = async (email: string) => {
-  console.log("In service", email);
   const existedUser = await userModel.findOne({ email });
-  console.log(existedUser);
-
-  if (!existedUser) throw new appError(StatusCodes.NOT_FOUND, "User not exist");
+  if (!existedUser) {
+    throw new appError(StatusCodes.NOT_FOUND, "User not exist");
+  }
   if (existedUser.isVerified === false) {
     throw new appError(StatusCodes.FORBIDDEN, "User is not verified");
   }
@@ -202,12 +201,10 @@ const forgotPassword = async (email: string) => {
   };
 
   const resetToken = jwt.sign(jwtPayload, envVars.JWT_ACCESS_SECRET as string, {
-    expiresIn: "59m",
+    expiresIn: "5m",
   });
   const resetUiLink = `${envVars.FRONEND_URL}/forgot-password?id=${existedUser._id}&resetToken=${resetToken}`;
 
-  console.log(`resetToken ${resetToken}`);
-  console.log(`resetUiLink ${resetUiLink}`);
 
   await sendEmail({
     to: existedUser.email,

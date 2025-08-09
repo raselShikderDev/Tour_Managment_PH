@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import nodemailer from "nodemailer";
@@ -36,33 +37,29 @@ export const sendEmail = async ({
   attachments,
 }: sendEmailOptions) => {
   try {
+    if (envVars.NODE_ENV === "Development") console.log("started sending email");
     const templatePath = path.join(__dirname, `templates/${templateName}.ejs`);
     const html = await ejs.renderFile(templatePath, templateData);
-
     const info = await transporter.sendMail({
       from: envVars.SMTP_FROM,
       to,
       subject,
-      html:html,
+      html: html,
       attachments: attachments?.map((attachment) => ({
-        fileName: attachment.filename,
+        filename: attachment.filename,
         content: attachment.content,
         contentType: attachment.contentType,
       })),
     });
-    // eslint-disable-next-line no-console
-    if (envVars.NODE_ENV === "Development") console.log(`\u2709\uFE0F Email send to ${to}: ${info.messageId}`);
+    if (envVars.NODE_ENV === "Development")
+      console.log(`\u2709\uFE0F Email send to ${to}: ${info.messageId}`);
   } catch (error) {
-    // eslint-disable-next-line no-console
     if (envVars.NODE_ENV === "Development") console.log(error);
-    throw new appError(401, "Sending email erorr");
+    throw new appError(401, "Sending email error");
   }
 };
 
-
-
 // http://localhost:3000/forgot-password?id=68972656c39528daa0a108bc&resetToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNjg5NzI2NTZjMzk1MjhkYWEwYTEwOGJjIiwiZW1haWwiOiJyYXNlbC5haG1lZC55dEBnbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc1NDczNzUwNiwiZXhwIjoxNzU0NzM3ODA2fQ._QgyCLQtL2_N1iP3UGUW3jDCxJro1hGq68pdsXI_dxw
-
 
 // /* eslint-disable @typescript-eslint/no-explicit-any */
 // import ejs from "ejs";
