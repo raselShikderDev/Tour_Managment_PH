@@ -8,7 +8,9 @@ import { otpServices } from "./otp.services";
 // chaning user password based on user token in case of while user need to chnage password
 const sendOtp = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    await otpServices.otpSend(req.body.email, req.body.name)
+      console.log(`In controller req.body is: ${req.body}`);
+      console.log(`In controller req.body.email is: ${req.body.email}`);
+    await otpServices.otpSend(req.body.email)
     sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,

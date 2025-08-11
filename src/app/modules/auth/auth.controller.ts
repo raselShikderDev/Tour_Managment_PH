@@ -24,8 +24,13 @@ const credentialsLogin = catchAsync(
       }
 
       if (!user) {
+        if(info.message === "User is not verified"){
+          return next(new appError(401, info.message));
+        }
         return next(new appError(StatusCodes.NOT_FOUND, info.message));
       }
+
+
 
       const userTokens = await createUserToken(user);
 

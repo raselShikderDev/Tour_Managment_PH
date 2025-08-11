@@ -1,10 +1,6 @@
 import z from "zod";
 
 export const sendOtpZodSchema = z.object({
-  name: z
-    .string({ invalid_type_error: "name must be a string" })
-    .min(3, { message: "name must be at least three character" })
-    .max(50, { message: "name should contain maximum 50 chacacter" }),
   email: z
     .string({ invalid_type_error: "Invalid email address formate" })
     .min(5, { message: "email should be at least 5 character" })

@@ -20,7 +20,7 @@ const credentialsLogin = async (payload: Partial<IUser>) => {
 
   if (!existedUser) throw new appError(StatusCodes.NOT_FOUND, "User not exist");
   if (existedUser.isVerified === false) {
-    throw new appError(StatusCodes.FORBIDDEN, "User is not verified");
+    throw new appError(401, "User is not verified");
   }
 
   if (
@@ -204,7 +204,6 @@ const forgotPassword = async (email: string) => {
     expiresIn: "5m",
   });
   const resetUiLink = `${envVars.FRONEND_URL}/forgot-password?id=${existedUser._id}&resetToken=${resetToken}`;
-
 
   await sendEmail({
     to: existedUser.email,

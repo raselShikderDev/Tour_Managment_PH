@@ -59,7 +59,9 @@ const createUser = catchAsync(
       statusCode:StatusCodes.CREATED,
       success:true,
       message:"User created successfully",
-      data:newUser,
+      data:{
+        email:newUser.email
+      },
     })
   }
 );

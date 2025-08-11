@@ -15,8 +15,12 @@ const generateOtp = (leanth = 6) => {
 };
 
 // send otp to user`
-const otpSend = async (email: string, name: string) => {
+const otpSend = async (email: string) => {
+  console.log(`In service Request recived for send otp to: ${email}`);
+  
   const existedUser = await userModel.findOne({ email });
+  console.log(`Existed user: ${existedUser}`);
+  
   if (!existedUser) {
     throw new appError(StatusCodes.NOT_FOUND, "User not exist");
   }
@@ -48,7 +52,7 @@ const otpSend = async (email: string, name: string) => {
       subject: "Verify OTP Code",
       templateName: "otp",
       templateData: {
-        name,
+        name:existedUser.name,
         otp,
       },
     });
