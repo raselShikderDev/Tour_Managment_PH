@@ -19,9 +19,7 @@ const credentialsLogin = async (payload: Partial<IUser>) => {
   const existedUser = await userModel.findOne({ email });
 
   if (!existedUser) throw new appError(StatusCodes.NOT_FOUND, "User not exist");
-  if (existedUser.isVerified === false) {
-    throw new appError(401, "User is not verified");
-  }
+
 
   if (
     existedUser.isActive === isActive.INACTIVE ||
@@ -41,8 +39,15 @@ const credentialsLogin = async (payload: Partial<IUser>) => {
     existedUser.password as string
   );
   console.log(`passMatch in auth login: ${isLoggedIn}`);
-  if (!isLoggedIn)
+  if (!isLoggedIn){
+          console.log(`In not valid password block`)
     throw new appError(StatusCodes.BAD_REQUEST, "Invalid Password");
+  }
+
+    if (existedUser.isVerified === false) {
+      console.log(`in User is not veified Block`)
+    throw new appError(401, "User is not verified");
+  }
 
   // const jwtPayload = {
   //   email: existedUser.email,

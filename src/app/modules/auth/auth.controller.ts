@@ -15,17 +15,23 @@ import passport from "passport";
 // Login by Passport credentials athentication and giving a access token to user API
 const credentialsLogin = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log("Recevif losign request in controller", req.body);
+    console.log("Recieve losign request in controller", req.body);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     passport.authenticate("local", async (err: any, user: any, info: any) => {
       // if(err) next(err)
       if (err) {
+        console.log(err.message);
         return next(new appError(StatusCodes.BAD_REQUEST, err.message));
       }
 
       if (!user) {
-        if(info.message === "User is not verified"){
-          return next(new appError(401, info.message));
+        if (info.message === "Invalid password") {
+          console.log(`In controller - not valid password block`)
+           return next(new appError(500, info.message));
+        }
+        if (info.message === "User is not verified") {
+                console.log(`In controller - in User is not veified block`)
+           return next(new appError(StatusCodes.UNAUTHORIZED, info.message));
         }
         return next(new appError(StatusCodes.NOT_FOUND, info.message));
       }

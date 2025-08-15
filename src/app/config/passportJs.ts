@@ -26,15 +26,24 @@ passport.use(
          return done(null, false, { message: "User not exist" });
         }
 
-        if (existedUser.isVerified === false) {
-            return done(null, false, { message: "User is not verified" });
-        }
-
         if (
           existedUser.isActive === isActive.INACTIVE ||
           existedUser.isActive === isActive.BLOCKED
         ) {
           return done(null, false, { message: `User is ${existedUser.isActive}` });
+        }
+
+         const hashedPassword = await bcrypt.compare(
+          password,
+          existedUser?.password as string
+        );
+        if (!hashedPassword) {
+          return done(null, false, { message: "Password is invalid" });
+        }
+
+        if (existedUser.isVerified === false) {
+            console.log(`In passport - User is not veified block`)
+            return done(null, false, { message: "User is not verified" });
         }
 
         if (existedUser.isDeleted === true) {
@@ -55,13 +64,7 @@ passport.use(
           });
         }
 
-        const hashedPassword = await bcrypt.compare(
-          password,
-          existedUser?.password as string
-        );
-        if (!hashedPassword) {
-          return done(null, false, { message: "Password is invalid" });
-        }
+       
         return done(null, existedUser);
       } catch (error) {
         console.log("Credential login faild: ", error);
