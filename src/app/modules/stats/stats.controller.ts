@@ -5,6 +5,8 @@ import { StatsService } from "./stats.service"
 import sendResponse from "../../utils/sendResponse"
 import { StatusCodes } from "http-status-codes"
 
+
+
 const getBookingStats = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const result = await StatsService.getBookingStats()
@@ -19,9 +21,18 @@ const getBookingStats = catchAsync(
 )
 
 
-const getPaymentStats = async() => {
-return {}
-}
+const getPaymentStats = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await StatsService.getPaymentStats()
+
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "All payments stats retrived successfully",
+      data: result,
+    });
+  }
+)
 
 // Getting all users stats
 const getUserStats =catchAsync(
