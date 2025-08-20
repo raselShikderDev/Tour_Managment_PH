@@ -6,6 +6,7 @@ import { envVars } from "../../config/env";
 import sendResponse from "../../utils/sendResponse";
 import { StatusCodes } from "http-status-codes";
 import { JwtPayload } from "jsonwebtoken";
+import { sslServicess } from "../sslcommerz/sslcommerce.service";
 
 
 // Initial Payment
@@ -79,6 +80,21 @@ const invoicesAllpayment = catchAsync(
         statusCode: StatusCodes.OK,
         success: true,
         message: "All invoice successfully retrived ",
+        data: result,
+    });
+  }
+);
+
+const validatePayment = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    // eslint-disable-next-line no-console
+    console.log(`SSL req.body: ${req.body}`);
+    
+   const result = await sslServicess.PaymentValidator(req.body)
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Payment successfully verified",
         data: result,
     });
   }
