@@ -13,6 +13,7 @@ import { IUser } from "../users/user.interface";
 import { ITour } from "../tours/tour.interface";
 import { uploadBufferCloudinary } from "../../config/cloudinary.config";
 import { UploadApiResponse } from "cloudinary";
+import { JwtPayload } from "jsonwebtoken";
 
 // Updating Payment sataus to paid
 const initPayment = async (bookingId: string) => {
@@ -119,7 +120,7 @@ const successPayment = async (query: Record<string, string>) => {
 
     await paymentModel.findByIdAndUpdate(
       updatedPayment._id,
-      { invoieUrl: uploadedInvoice.url || uploadedInvoice.secure_url },
+      { invoiceUrl: uploadedInvoice.url || uploadedInvoice.secure_url },
       { runValidators: true, new: true, session: session }
     );
 
@@ -230,17 +231,58 @@ const cancelPayment = async (query: Record<string, string>) => {
   }
 };
 
-const SinglepaymentInvoiceUrl = async(paymentId:string)=>{
-  const invoiceUrl = await paymentModel.findById(paymentId)
+
+// Get singel invoice of an payment
+const SinglepaymentInvoiceUrl = async (paymentId: string, decodedToken:JwtPayload) => {
+  
+  const existedBooking = await bookingModel.findOne({user:decodedToken.userId, payment:paymentId})
+  
+  if (existedBooking === null || !existedBooking) {
+     throw new appError(
+      StatusCodes.NOT_FOUND,
+      "Booking not found"
+    );
+  }
+  // if (existedBooking === null || !existedBooking) {
+  //    throw new appError(
+  //     StatusCodes.BAD_REQUEST,
+  //     "You are not authorized to view this invoice"
+  //   );
+  // }
+  const invoiceUrl = await paymentModel.findById(paymentId);
   if (!invoiceUrl) {
-    throw new appError(StatusCodes.NOT_FOUND, "Payment not completed yet! Invoice not available")
+    throw new appError(
+      StatusCodes.BAD_REQUEST,
+      "Payment not completed yet! Invoice not available"
+    );
   }
 
-  if(invoiceUrl.invoieUrl === null){
-    throw new appError(StatusCodes.NOT_FOUND, "Invoice not found")
+  if (!invoiceUrl.invoiceUrl) {
+    throw new appError(
+      StatusCodes.NOT_FOUND,
+      "Invoice not found"
+    );
+  }
+  return {
+    success: true,
+    message: "Invoice os ready to download",
+    invoice: invoiceUrl.invoiceUrl,
+  };
+};
+
+// Get all invoice of payment only admins ar
+const invoicesAllpayment = async () => {
+  
+  const AllinvoiceUrl = await paymentModel.find({invoiceUrl:{$ne:null}}).select("invoiceUrl");
+  if (!AllinvoiceUrl || AllinvoiceUrl === null) {
+    throw new appError(
+      StatusCodes.BAD_REQUEST,
+      "No Payment completed yet"
+    );
   }
 
-}
+  return  AllinvoiceUrl
+};
 
 export const paymentServices = {
   successPayment,
@@ -248,4 +290,5 @@ export const paymentServices = {
   cancelPayment,
   initPayment,
   SinglepaymentInvoiceUrl,
+  invoicesAllpayment,
 };

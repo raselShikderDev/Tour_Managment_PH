@@ -15,7 +15,7 @@ const paymentSchema = new mongoose.Schema<IPayment>({
         unique:true
     },
     paymentGateway:{type:Schema.Types.Mixed},
-    invoieUrl:{type:String},
+    invoiceUrl:{type:String},
     status:{
         type:String,
         enum:Object.values(PAYMENT_STATUS),

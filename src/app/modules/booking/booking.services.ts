@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-console */
 
 import { StatusCodes } from "http-status-codes";
 import appError from "../../errorHelper/appError";

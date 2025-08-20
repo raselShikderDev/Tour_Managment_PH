@@ -5,6 +5,7 @@ import { paymentServices } from "./payment.services";
 import { envVars } from "../../config/env";
 import sendResponse from "../../utils/sendResponse";
 import { StatusCodes } from "http-status-codes";
+import { JwtPayload } from "jsonwebtoken";
 
 
 // Initial Payment
@@ -54,15 +55,30 @@ const cancelPayment = catchAsync(
   }
 );
 
+
 // get singel Payment's invoice url
 const SinglepaymentInvoiceUrl = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
    const paymentId = req.params.paymentid
-   const result = await paymentServices.SinglepaymentInvoiceUrl(paymentId)
+   const decodedToken = req.user
+   const result = await paymentServices.SinglepaymentInvoiceUrl(paymentId, decodedToken as JwtPayload)
     sendResponse(res, {
         statusCode: StatusCodes.OK,
         success: true,
         message: "Invoice successfully retrived ",
+        data: result,
+    });
+  }
+);
+
+// get all Payment's invoice url - only admins are allowed
+const invoicesAllpayment = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+   const result = await paymentServices.invoicesAllpayment()
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "All invoice successfully retrived ",
         data: result,
     });
   }
@@ -76,4 +92,5 @@ export const paymentController = {
   cancelPayment,
   initPayment,
   SinglepaymentInvoiceUrl,
+  invoicesAllpayment,
 };

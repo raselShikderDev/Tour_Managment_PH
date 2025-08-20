@@ -14,7 +14,7 @@ export interface IPayment {
     transactionId:string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     paymentGateway?:any,
-    invoieUrl?:string,
+    invoiceUrl?:string,
     status:PAYMENT_STATUS,
     amount:number,
 }
