@@ -5,9 +5,20 @@ import { StatsService } from "./stats.service"
 import sendResponse from "../../utils/sendResponse"
 import { StatusCodes } from "http-status-codes"
 
-const getBookingStats = async() => {
-return {}
-}
+const getBookingStats = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await StatsService.getBookingStats()
+
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "All bookings stats retrived successfully",
+      data: result,
+    });
+  }
+)
+
+
 const getPaymentStats = async() => {
 return {}
 }
