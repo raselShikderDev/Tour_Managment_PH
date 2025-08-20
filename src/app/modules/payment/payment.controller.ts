@@ -54,7 +54,19 @@ const cancelPayment = catchAsync(
   }
 );
 
-
+// get singel Payment's invoice url
+const SinglepaymentInvoiceUrl = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+   const paymentId = req.params.paymentid
+   const result = await paymentServices.SinglepaymentInvoiceUrl(paymentId)
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Invoice successfully retrived ",
+        data: result,
+    });
+  }
+);
 
 
 
@@ -63,4 +75,5 @@ export const paymentController = {
   failPayment,
   cancelPayment,
   initPayment,
+  SinglepaymentInvoiceUrl,
 };

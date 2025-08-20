@@ -11,6 +11,8 @@ import { generateInvoice, IInvoiceInfo } from "../../utils/invoice";
 import { sendEmail } from "../../utils/sendEmail";
 import { IUser } from "../users/user.interface";
 import { ITour } from "../tours/tour.interface";
+import { uploadBufferCloudinary } from "../../config/cloudinary.config";
+import { UploadApiResponse } from "cloudinary";
 
 // Updating Payment sataus to paid
 const initPayment = async (bookingId: string) => {
@@ -97,12 +99,30 @@ const successPayment = async (query: Record<string, string>) => {
       guestCount: updatedBooking.guestCount,
       totalAmount: updatedPayment.amount,
     };
+
+    // Generating pdf
     let generatedPDF;
     try {
       generatedPDF = await generateInvoice(invoiceData);
     } catch (error: any) {
       throw new appError(501, `Generating invoice is failed ${error.message}`);
     }
+
+    // uploading invoice in cloudinary
+    const uploadedInvoice: UploadApiResponse = await uploadBufferCloudinary(
+      generatedPDF,
+      "Invoice"
+    );
+    // console.log(uploadedInvoice);
+
+    // updating invoice urrl to payment
+
+    await paymentModel.findByIdAndUpdate(
+      updatedPayment._id,
+      { invoieUrl: uploadedInvoice.url || uploadedInvoice.secure_url },
+      { runValidators: true, new: true, session: session }
+    );
+
     // Sending email to user's email
     try {
       await sendEmail({
@@ -210,9 +230,22 @@ const cancelPayment = async (query: Record<string, string>) => {
   }
 };
 
+const SinglepaymentInvoiceUrl = async(paymentId:string)=>{
+  const invoiceUrl = await paymentModel.findById(paymentId)
+  if (!invoiceUrl) {
+    throw new appError(StatusCodes.NOT_FOUND, "Payment not completed yet! Invoice not available")
+  }
+
+  if(invoiceUrl.invoieUrl === null){
+    throw new appError(StatusCodes.NOT_FOUND, "Invoice not found")
+  }
+
+}
+
 export const paymentServices = {
   successPayment,
   failPayment,
   cancelPayment,
   initPayment,
+  SinglepaymentInvoiceUrl,
 };
