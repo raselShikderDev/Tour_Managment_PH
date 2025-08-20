@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { Router, Response, Request, NextFunction } from "express";
+import { Router } from "express";
 import { userCcontroller } from "./user.controller";
 import { createZodValidation, updateUserZodValidation } from "./user.validation";
 import { validateRequest } from "../../middleware/validateRequest";
