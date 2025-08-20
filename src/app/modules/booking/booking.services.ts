@@ -99,10 +99,10 @@ const createBooking = async (payload: Partial<Ibooking>, userId: string) => {
     };
 
     const sslPayment = await sslServicess.sslPaymentInit(sslPaylaod);
-    console.log("sslPayment: ", sslPayment);
+    // console.log("sslPayment: ", sslPayment);
     
 
-    session.commitTransaction();
+    await session.commitTransaction();
     session.endSession();
 
     return {
@@ -110,9 +110,11 @@ const createBooking = async (payload: Partial<Ibooking>, userId: string) => {
       booking: updatedBooking,
     };
   } catch (error) {
-    session.abortTransaction();
+    await session.abortTransaction();
     session.endSession();
     throw error;
+  } finally{
+    session.endSession();
   }
 };
 

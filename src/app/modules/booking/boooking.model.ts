@@ -26,6 +26,9 @@ const bookingSchema = new mongoose.Schema<Ibooking>({
         enum:Object.values(BOOKING_STATUS),
         default:BOOKING_STATUS.PENDING
     }
+},{
+    timestamps:true,
+    versionKey:false,
 })
 
 export const bookingModel = mongoose.model<Ibooking>("Bookings", bookingSchema)

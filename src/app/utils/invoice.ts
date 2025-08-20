@@ -1,16 +1,26 @@
 import PDFDocument from "pdfkit";
 import appError from "../errorHelper/appError";
 
-interface IInvoiceInfo {
-  name: string;
-  transactionId:string;
-  bookingDate:string;
-  tourTitle:string;
-  guestCount:number;
-  totalAmount:number;
+export interface IInvoiceInfo {
+  transactionId: string;
+  bookingDate: Date;
+  userName: string;
+  tourTitle: string;
+  guestCount: number;
+  totalAmount: number;
 }
 
-export const generateInvoice = (invoiceData: IInvoiceInfo) => {
+export const generateInvoice = (
+  invoiceData: IInvoiceInfo
+): Promise<Buffer<ArrayBufferLike>> => {
+  const formattedDate = new Date(invoiceData.bookingDate).toLocaleDateString(
+    "en-GB",
+    {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }
+  );
   try {
     return new Promise((resolve, reject) => {
       const doc = new PDFDocument({ size: "A4", margin: 50 });
@@ -22,25 +32,24 @@ export const generateInvoice = (invoiceData: IInvoiceInfo) => {
 
       // Creating PDF
       doc.fontSize(22).text("Invoice", { align: "center" });
-
       doc.moveDown();
-
       doc.fontSize(14).text(`Transaction ID: ${invoiceData.transactionId}`);
-      doc.text(`Booking Date: ${invoiceData.bookingDate}`)
+
+      doc.text(`Booking Date: ${formattedDate}`);
+      doc.text(`Customer : ${invoiceData.userName}`);
+      doc.moveDown();
+      doc.text(`Tour: ${invoiceData.tourTitle}`);
+      doc.text(`Guests: ${invoiceData.guestCount}`);
+      doc.text(`Total Amount: ${invoiceData.totalAmount.toFixed(2)}`);
 
       doc.moveDown();
+      doc.text("Thank you for booking with us!", { align: "center" });
 
-      doc.text(`Tour: ${invoiceData.tourTitle}`);
-doc.text(`Guests: ${invoiceData.guestCount}`);
-doc.text(`Total Amount: ${invoiceData.totalAmount.toFixed(2)}`);
-
-doc.moveDown();
-doc.text("Thank you for booking with us!", {align: "center"});
-
-doc.moveDown();
-  })
+      doc.moveDown();
+      doc.end();
+    });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
-    new appError(501, `Invoice generation failed: ${err.message}`);
+    throw new appError(501, `Invoice generation failed: ${err.message}`);
   }
-}
+};

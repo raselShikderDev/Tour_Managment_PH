@@ -23,6 +23,9 @@ const paymentSchema = new mongoose.Schema<IPayment>({
     },
     amount:{type:Number}
 
+},{
+    timestamps:true,
+    versionKey:false,
 })
 
 export const paymentModel = mongoose.model<IPayment>("Payments", paymentSchema)
