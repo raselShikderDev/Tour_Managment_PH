@@ -58,8 +58,19 @@ const updateUser = async (
   payload: Partial<IUser>,
   decodedToken: JwtPayload
 ) => {
+
+  if (decodedToken.role ===role.USER || decodedToken.role === role.GUIDE) {
+    if (decodedToken.userId !== userId) {
+      throw new appError(StatusCodes.UNAUTHORIZED, "You are not authorized to update")
+    }
+  }
+
   const userExist = await userModel.findById(userId);
   if (!userExist) throw new appError(StatusCodes.NOT_FOUND, "User not found");
+
+  if (decodedToken.role === role.ADMIN && userExist.role === role.SUPER_ADMIN) {
+    throw new appError(StatusCodes.UNAUTHORIZED, "You are not allowed to update")
+  }
 
 // if user want to change role
   if (payload.role) {
@@ -80,12 +91,12 @@ const updateUser = async (
     }
   }
 
-  if (payload.password) {
-    payload.password = await bcrypt.hash(
-      payload.password,
-      Number(envVars.BCRYPT_SALT_ROUND)
-    );
-  }
+  // if (payload.password) {
+  //   payload.password = await bcrypt.hash(
+  //     payload.password,
+  //     Number(envVars.BCRYPT_SALT_ROUND)
+  //   );
+  // }
 
   const updateUser = await userModel.findByIdAndUpdate(userId, payload, {
     new: true,
