@@ -89,7 +89,6 @@ export const globalError = async (
 ) => {
   let statusCode = 500;
   let message = `Somthing went wrong: ${err.message}`;
-  // eslint-disable-next-line no-console
   // console.log("err in global: ", err);
   
 
