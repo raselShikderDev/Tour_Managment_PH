@@ -40,4 +40,5 @@ export interface IUser{
     auths:IAuthProvider[];
     bookings?:Types.ObjectId[];
     guide?:Types.ObjectId[];
+    createdAt?:Date;
 }

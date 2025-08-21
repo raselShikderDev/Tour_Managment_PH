@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { Router, Response, Request, NextFunction } from "express";
+import { Router } from "express";
 import { userCcontroller } from "./user.controller";
 import { createZodValidation, updateUserZodValidation } from "./user.validation";
 import { validateRequest } from "../../middleware/validateRequest";
@@ -16,6 +15,9 @@ router.get(
   userCcontroller.getAllUsers
 );
 
+// Get current user
+router.get("/me", checkAuth(...Object.values(role)), userCcontroller.getMe)
+
 // user register route
 router.post(
   "/register",
@@ -23,16 +25,18 @@ router.post(
   userCcontroller.createUser
 );
 
+// Get singel user
+router.get("/:userId", checkAuth(role.ADMIN, role.SUPER_ADMIN), userCcontroller.getSingelUser)
+
+
 // user update route
 router.patch("/:userId", validateRequest(updateUserZodValidation), checkAuth(...Object.values(role)), userCcontroller.updateUser);
 
 
 // Delete user
-router.delete("/:userId", checkAuth(role.ADMIN, role.SUPER_ADMIN), userCcontroller.getAllUsers)
+router.delete("/:userId", checkAuth(role.ADMIN, role.SUPER_ADMIN), userCcontroller.deleteUser)
 
-// Get singel user
-router.get("/:userId", checkAuth(role.ADMIN, role.SUPER_ADMIN), userCcontroller.getSingelUser)
 
-//
+
 
 export const userRoutes = router;

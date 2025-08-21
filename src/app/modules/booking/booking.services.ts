@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-console */
 
 import { StatusCodes } from "http-status-codes";
 import appError from "../../errorHelper/appError";
@@ -11,13 +10,9 @@ import { paymentModel } from "../payment/payment.model";
 import { PAYMENT_STATUS } from "../payment/payment.interfce";
 import { sslServicess } from "../sslcommerz/sslcommerce.service";
 import { ISSLCommerz } from "../sslcommerz/sslcommerce.interface";
+import { generateTransactionId } from "../../utils/getTransaction";
 
-// Generating Transaction id with mixture of current date userId and random Number
-const GenerateTransactionId = (id: string): string => {
-  return `trans_${Date.now()}_${Math.floor(Math.random() * 1000)}_${id.slice(
-    18
-  )}`;
-};
+
 
 // Creating Booking
 const createBooking = async (payload: Partial<Ibooking>, userId: string) => {
@@ -52,7 +47,7 @@ const createBooking = async (payload: Partial<Ibooking>, userId: string) => {
     const amount = Number(tour.costForm) * Number(payload.guestCount);
     // console.log(`Amount: ${amount}`);
 
-    const transId = GenerateTransactionId(userId);
+    const transId = generateTransactionId(userId);
     const booking = await bookingModel.create(
       [
         {
@@ -103,10 +98,10 @@ const createBooking = async (payload: Partial<Ibooking>, userId: string) => {
     };
 
     const sslPayment = await sslServicess.sslPaymentInit(sslPaylaod);
-    console.log("sslPayment: ", sslPayment);
+    // console.log("sslPayment: ", sslPayment);
     
 
-    session.commitTransaction();
+    await session.commitTransaction();
     session.endSession();
 
     return {
@@ -114,9 +109,11 @@ const createBooking = async (payload: Partial<Ibooking>, userId: string) => {
       booking: updatedBooking,
     };
   } catch (error) {
-    session.abortTransaction();
+    await session.abortTransaction();
     session.endSession();
     throw error;
+  } finally{
+    session.endSession();
   }
 };
 

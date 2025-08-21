@@ -15,34 +15,46 @@ import passport from "passport";
 // Login by Passport credentials athentication and giving a access token to user API
 const credentialsLogin = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-
+    console.log("Recieve losign request in controller", req.body);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    passport.authenticate("local", async(err:any, user:any, info:any)=>{
+    passport.authenticate("local", async (err: any, user: any, info: any) => {
       // if(err) next(err)
-      if(err) next( new appError(StatusCodes.BAD_REQUEST, err))
-      
-      if(!user) next(err)
-      if(!user) next( new appError(StatusCodes.NOT_FOUND, info.message))
+      if (err) {
+        console.log(err.message);
+        return next(new appError(StatusCodes.BAD_REQUEST, err.message));
+      }
+
+      if (!user) {
+        if (info.message === "Invalid password") {
+          console.log(`In controller - not valid password block`)
+           return next(new appError(500, info.message));
+        }
+        if (info.message === "User is not verified") {
+                console.log(`In controller - in User is not veified block`)
+           return next(new appError(StatusCodes.UNAUTHORIZED, info.message));
+        }
+        return next(new appError(StatusCodes.NOT_FOUND, info.message));
+      }
 
 
-        const userTokens = await createUserToken(user)
 
-        setAuthCookie(res, userTokens);
+      const userTokens = await createUserToken(user);
 
-        const {password, ...rest} = user
+      setAuthCookie(res, userTokens);
 
-    sendResponse(res, {
-      statusCode: StatusCodes.OK,
-      success: true,
-      message: "User logged in successfully",
-      data: {
-        accesToken:userTokens.accessToken,
-        refreshToken:userTokens.refreshToken,
-        user:rest,
-      },
-    });
+      const { password, ...rest } = user;
 
-    })(req, res, next)
+      sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "User logged in successfully",
+        data: {
+          accesToken: userTokens.accessToken,
+          refreshToken: userTokens.refreshToken,
+          user: rest,
+        },
+      });
+    })(req, res, next);
   }
 );
 
@@ -114,14 +126,86 @@ const logoutUser = catchAsync(
   }
 );
 
-// Reseting user password
-const resetPassword = catchAsync(
+// Handling google authentiction "/Google/callback" route
+const googleCallback = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    let redirect = req.query.state as string;
+    if (redirect.startsWith("/")) {
+      redirect = redirect.slice(1);
+    }
+    const user = req.user;
+    if (!user) {
+      throw new appError(StatusCodes.NOT_FOUND, "User not found");
+    }
+    const userTokens = await createUserToken(user);
+    // await setAuthCookie(res, userTokens)
+    console.log(`frontendUtl: ${envVars.FRONEND_URL}`);
+
+    res.redirect(`${envVars.FRONEND_URL as string}/${redirect}`);
+  }
+);
+
+// chaning user password based on user token in case of while user need to chnage password
+const chnagePassword = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const newPassword = req.body.newPassword;
-    const oldPassword = req.body.oldPassword;
+    const oldPassword = req.body;
     const decodedToken = req.user;
 
-    await authServices.resetPassword(newPassword, oldPassword, decodedToken as JwtPayload);
+    const data = await authServices.chnagePassword(
+      newPassword,
+      oldPassword,
+      decodedToken as JwtPayload
+    );
+    if (!data) {
+      throw new appError(
+        StatusCodes.BAD_REQUEST,
+        "Changing password is failed"
+      );
+    }
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Password successfully chnaged",
+      data: null,
+    });
+  }
+);
+
+// setting user password while user register via google
+const setPassword = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const newPassword = req.body.newPassword;
+    const decodedToken = req.user;
+
+    await authServices.setPassword(decodedToken as JwtPayload, newPassword);
+
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Password successfully set",
+      data: null,
+    });
+  }
+);
+
+// resetting user password via reset password link
+const resetPassword = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const decodedToken = req.user;
+
+    console.log("In auth controller decodedToken:", decodedToken);
+    const data = await authServices.resetPassword(
+      req.body,
+      decodedToken as JwtPayload
+    );
+
+    if (!data) {
+      throw new appError(
+        StatusCodes.BAD_REQUEST,
+        "new pass and old pass not found"
+      );
+    }
 
     sendResponse(res, {
       statusCode: StatusCodes.OK,
@@ -132,27 +216,34 @@ const resetPassword = catchAsync(
   }
 );
 
-// Handling google authentiction "/Google/callback" route
-const googleCallback = catchAsync(async (req: Request, res: Response, next: NextFunction)=>{
- let redirect = req.query.state as string
- if (redirect.startsWith("/")){
-  redirect = redirect.slice(1)
- }
-  const user = req.user
-  if (!user) {
-    throw new appError(StatusCodes.NOT_FOUND, "User not found")
+// Sending forget password link to email to chnage user password
+const forgotPassword = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const email = req.body.email;
+
+    const data = await authServices.forgotPassword(email);
+    if (!data) {
+      throw new appError(
+        StatusCodes.BAD_REQUEST,
+        "Failed to send password reset link"
+      );
+    }
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Password reset link sent to user email",
+      data: null,
+    });
   }
-  const userTokens = await createUserToken(user)
-  // await setAuthCookie(res, userTokens)
-  console.log(`frontendUtl: ${envVars.FRONEND_URL}`);
-  
-  res.redirect(`${envVars.FRONEND_URL as string}/${redirect}`)
-})
+);
 
 export const authController = {
   credentialsLogin,
   getNewAccessToken,
   logoutUser,
-  resetPassword,
   googleCallback,
+  chnagePassword,
+  setPassword,
+  forgotPassword,
+  resetPassword,
 };

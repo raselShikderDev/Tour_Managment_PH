@@ -1,11 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-console */
 import { StatusCodes } from "http-status-codes";
 import { envVars } from "../../config/env"
 import appError from "../../errorHelper/appError";
 import { ISSLCommerz } from "./sslcommerce.interface"
 import { default as axios } from 'axios';
+import { paymentModel } from "../payment/payment.model";
 
 
- const sslPaymentInit =async (payload:ISSLCommerz)=>{
+ const sslPaymentInit = async (payload:ISSLCommerz)=>{
     try {
       const data ={
           store_id: envVars.SSL.SSL_STORE_ID,
@@ -16,7 +19,7 @@ import { default as axios } from 'axios';
             success_url: `${envVars.SSL.SSL_SUCCESS_BACKEND_URL}?transactionId=${payload.transactionId}&amount=${payload.amount}&status=success`,
             cancel_url: `${envVars.SSL.SSL_CANCEL_BACKEND_URL}?transactionId=${payload.transactionId}&amount=${payload.amount}&status=cancel`,
             fail_url: `${envVars.SSL.SSL_FAIL_BACKEND_URL}?transactionId=${payload.transactionId}&amount=${payload.amount}&status=fail`,
-            // ipn_url: "http://localhost:3030/ipn",
+            ipn_url: envVars.SSL.SSL_IPN_URL as string,
             shipping_method: "N/A",
             product_name: "Tour",
             product_category: "Service",
@@ -48,10 +51,8 @@ import { default as axios } from 'axios';
     })
 
     return response.data
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error:any) {
       if (envVars.NODE_ENV === "Development") {
-        // eslint-disable-next-line no-console
         console.log(error);
       }
       throw new appError(StatusCodes.BAD_REQUEST, error.message)
@@ -59,6 +60,23 @@ import { default as axios } from 'axios';
 
 }
 
+
+const PaymentValidator = async (payload:any)=>{
+try {
+    const response = await axios({
+    method:"GET",
+    url:`${envVars.SSL.SSL_VALIDATION_API}?val_id=${payload.val_id}&store_id=${envVars.SSL.SSL_STORE_ID}&store_passwd=${envVars.SSL.SSL_SECRET_KEY}`
+  })
+  console.log(`SSL Validator response: ${response.data}`);
+  await paymentModel.updateOne({transactionId:payload.tran_id}, {paymentGateway:response.data}, {runValidators:true})
+} catch (error:any) {
+  console.log(error);
+  throw new appError(StatusCodes.BAD_GATEWAY, `Payment validation failed: ${error.message}`)
+}
+  
+}
+
 export const sslServicess ={
   sslPaymentInit,
+  PaymentValidator,
 }

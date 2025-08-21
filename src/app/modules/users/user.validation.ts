@@ -35,12 +35,6 @@ export const updateUserZodValidation =  z.object({
     .string({ invalid_type_error: "name must be a string" })
     .min(3, { message: "name must be at least three character" })
     .max(50, { message: "name should contain maximum 50 chacacter" }).optional(),
-  password: z
-    .string({ invalid_type_error: "Invalid password type" })
-    .regex(
-      /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}:;<>,.?~\\/-]).{8,}$/,
-      "Password must be at least 8 characters long, include one uppercase letter, one number, and one special character"
-    ).optional(),
   phone: z
     .string({ invalid_type_error: "Invalid phone type" })
     .regex(

@@ -51,12 +51,12 @@ const tourSchema = new Schema<ITour>(
     division: {
       type: Schema.Types.ObjectId,
       ref: "Division",
-      requiured: true,
+      required: true,
     },
     tourType: {
       type: Schema.Types.ObjectId,
       ref: "TourTypes",
-      requiured: true,
+      required: true,
     },
   },
   {

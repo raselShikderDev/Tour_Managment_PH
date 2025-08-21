@@ -12,14 +12,16 @@ export const setAuthCookie = async (
   if (loggedinInfo.accessToken) {
     res.cookie("accessToken", loggedinInfo.accessToken, {
       httpOnly: true,
-      secure: false,
+      secure: true,
+      sameSite: "none",
     });
   }
 
   if (loggedinInfo.refreshToken) {
     res.cookie("refreshToken", loggedinInfo.refreshToken, {
       httpOnly: true,
-      secure: false,
+      secure: true,
+      sameSite: "none",
     });
   }
 };

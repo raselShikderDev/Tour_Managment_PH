@@ -5,7 +5,7 @@ dotenv.config();
 
 interface IEnvVars {
   MONGO_URI: string;
-  PORT: string; 
+  PORT: string;
   NODE_ENV: "Development" | "Production";
   JWT_ACCESS_EXPIRES: string;
   JWT_ACCESS_SECRET: string;
@@ -19,6 +19,12 @@ interface IEnvVars {
   GOOGLE_CALLBACK_URL: string;
   FRONEND_URL: string;
   EXPRESS_SESSION_SECRET: string;
+  SMTP_HOST: string;
+  SMTP_FROM: string;
+  SMTP_PASS: string;
+  SMTP_USER: string;
+  SMTP_PORT: string;
+
   SSL: {
     SSL_VALIDATION_API: string;
     SSL_PAYMENT_API: string;
@@ -30,6 +36,7 @@ interface IEnvVars {
     SSL_SUCCESS_FRONTEND_URL: string;
     SSL_FAIL_FRONTEND_URL: string;
     SSL_CANCEL_FRONTEND_URL: string;
+    SSL_IPN_URL:string;
   };
   CLOUDINARY: {
     CLOUDINARY_URL: string;
@@ -37,6 +44,10 @@ interface IEnvVars {
     CLOUDINARY_API_KEY: string;
     CLOUDINARY_NAME: string;
   };
+  REDIS_HOST: string;
+  REDIS_PORT: string;
+  REDIS_USERNAME: string;
+  REDIS_PASSWORD: string;
 }
 
 const loadEnvVariables = () => {
@@ -70,6 +81,16 @@ const loadEnvVariables = () => {
     "CLOUDINARY_API_SECRET",
     "CLOUDINARY_API_KEY",
     "CLOUDINARY_NAME",
+    "SMTP_HOST",
+    "SMTP_FROM",
+    "SMTP_PASS",
+    "SMTP_PORT",
+    "SMTP_USER",
+    "REDIS_HOST",
+    "REDIS_PORT",
+    "REDIS_USERNAME",
+    "REDIS_PASSWORD",
+    "SSL_IPN_URL",
   ];
   requiredEnv.forEach((elem) => {
     if (!process.env[elem]) {
@@ -92,6 +113,11 @@ const loadEnvVariables = () => {
     GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL,
     EXPRESS_SESSION_SECRET: process.env.EXPRESS_SESSION_SECRET,
     FRONEND_URL: process.env.FRONEND_URL,
+    SMTP_HOST: process.env.SMTP_HOST,
+    SMTP_FROM: process.env.SMTP_FROM,
+    SMTP_PASS: process.env.SMTP_PASS,
+    SMTP_USER: process.env.SMTP_USER,
+    SMTP_PORT: process.env.SMTP_PORT,
     SSL: {
       SSL_VALIDATION_API: process.env.SSL_VALIDATION_API,
       SSL_PAYMENT_API: process.env.SSL_PAYMENT_API,
@@ -103,6 +129,7 @@ const loadEnvVariables = () => {
       SSL_SUCCESS_FRONTEND_URL: process.env.SSL_SUCCESS_FRONTEND_URL,
       SSL_FAIL_FRONTEND_URL: process.env.SSL_FAIL_FRONTEND_URL,
       SSL_CANCEL_FRONTEND_URL: process.env.SSL_CANCEL_FRONTEND_URL,
+      SSL_IPN_URL:process.env.SSL_IPN_URL,
     },
     CLOUDINARY: {
       CLOUDINARY_URL: process.env.CLOUDINARY_URL,
@@ -110,6 +137,10 @@ const loadEnvVariables = () => {
       CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
       CLOUDINARY_NAME: process.env.CLOUDINARY_NAME,
     },
+    REDIS_HOST: process.env.REDIS_HOST as string,
+    REDIS_PORT: process.env.REDIS_PORT as string,
+    REDIS_USERNAME: process.env.REDIS_USERNAME as string,
+    REDIS_PASSWORD: process.env.REDIS_PASSWORD as string,
   };
 };
 
