@@ -30,6 +30,7 @@ app.use((0, cors_1.default)({
     credentials: true,
 }));
 app.use(express_1.default.json());
+app.set("trust proxy", 1);
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use("/api/v1", routes_1.router);
 app.get("/", (req, res) => {
