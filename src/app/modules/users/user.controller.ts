@@ -136,8 +136,9 @@ const getSingelUser = catchAsync(
 // Retriveve current user data
 const getMe = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const decodedToken = req.user
-   const user = await userServices.getMe(decodedToken as JwtPayload);
+     const decodedToken = req.user as JwtPayload
+    
+   const user = await userServices.getSingelUser(decodedToken.userId);
     sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,

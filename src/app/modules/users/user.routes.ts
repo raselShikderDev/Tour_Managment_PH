@@ -1,13 +1,14 @@
 import { Router } from "express";
 import { userCcontroller } from "./user.controller";
-import { createZodValidation, updateUserZodValidation } from "./user.validation";
+import {
+  createZodValidation,
+  updateUserZodValidation,
+} from "./user.validation";
 import { validateRequest } from "../../middleware/validateRequest";
 import { checkAuth } from "../../middleware/checkAuth";
 import { role } from "./user.interface";
 
 const router = Router();
-
-
 
 router.get(
   "/all-users",
@@ -16,7 +17,7 @@ router.get(
 );
 
 // Get current user
-router.get("/me", checkAuth(...Object.values(role)), userCcontroller.getMe)
+router.get("/me", checkAuth(...Object.values(role)), userCcontroller.getMe);
 
 // user register route
 router.post(
@@ -26,17 +27,25 @@ router.post(
 );
 
 // Get singel user
-router.get("/:userId", checkAuth(role.ADMIN, role.SUPER_ADMIN), userCcontroller.getSingelUser)
-
+router.get(
+  "/:userId",
+  checkAuth(role.ADMIN, role.SUPER_ADMIN),
+  userCcontroller.getSingelUser
+);
 
 // user update route
-router.patch("/:userId", validateRequest(updateUserZodValidation), checkAuth(...Object.values(role)), userCcontroller.updateUser);
-
+router.patch(
+  "/:userId",
+  validateRequest(updateUserZodValidation),
+  checkAuth(...Object.values(role)),
+  userCcontroller.updateUser
+);
 
 // Delete user
-router.delete("/:userId", checkAuth(role.ADMIN, role.SUPER_ADMIN), userCcontroller.deleteUser)
-
-
-
+router.delete(
+  "/:userId",
+  checkAuth(role.ADMIN, role.SUPER_ADMIN),
+  userCcontroller.deleteUser
+);
 
 export const userRoutes = router;
