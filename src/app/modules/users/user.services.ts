@@ -112,8 +112,8 @@ const deleteuser = async (userid:string)=>{
 }
 
 // Get my profile's information
-const getMe = async (id:string)=>{
-  const user = await userModel.findById(id);
+const getMe = async (decodedToken:JwtPayload)=>{
+  const user = await userModel.findById(decodedToken.userId);
   if (user === null) throw new appError(StatusCodes.NOT_FOUND, "Your profile's information not found");
   return user;
 };

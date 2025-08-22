@@ -14,7 +14,7 @@ export const checkAuth =
     console.log(`Got reqest in checkauth - req.body: `, req.body);
     
     try {
-      const accessToken = req.headers.authorization;
+      const accessToken = req.headers.authorization || req.cookies.accessToken;
       if (!accessToken)
         throw new appError(StatusCodes.BAD_REQUEST, "Acces token not found");
 

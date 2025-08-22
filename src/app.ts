@@ -12,7 +12,6 @@ import session from "express-session";
 const app: Application = express();
 
 
-
 app.use(
   session({
     secret: envVars.EXPRESS_SESSION_SECRET as string,

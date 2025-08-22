@@ -136,12 +136,8 @@ const getSingelUser = catchAsync(
 // Retriveve current user data
 const getMe = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const id = req.params.userId;
-    
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new appError(StatusCodes.BAD_REQUEST, "User id is not valid");
-    }
-   const user = await userServices.getSingelUser(id);
+    const decodedToken = req.user
+   const user = await userServices.getMe(decodedToken as JwtPayload);
     sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,
