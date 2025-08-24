@@ -20,10 +20,8 @@ const env_1 = require("../config/env");
 const user_model_1 = require("../modules/users/user.model");
 const user_interface_1 = require("../modules/users/user.interface");
 const checkAuth = (...authRoles) => (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    // eslint-disable-next-line no-console
-    console.log(`Got reqest in checkauth - req.body: `, req.body);
     try {
-        const accessToken = req.headers.authorization;
+        const accessToken = req.headers.authorization || req.cookies.accessToken;
         if (!accessToken)
             throw new appError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, "Acces token not found");
         // const verifiedToekn = jwt.verify(
