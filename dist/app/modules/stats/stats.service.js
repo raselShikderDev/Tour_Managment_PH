@@ -114,6 +114,11 @@ const getTourStats = () => __awaiter(void 0, void 0, void 0, function* () {
         },
     ]);
     const totalTourByDivisionPromise = tour_model_1.tourModel.aggregate([
+        // {
+        //   $match: {
+        //     title: "my first tour 02",
+        //   },
+        // },
         // Stage 1: Connect / Populate division to tour by lookup
         {
             $lookup: {
@@ -125,7 +130,7 @@ const getTourStats = () => __awaiter(void 0, void 0, void 0, function* () {
         },
         // Stage 2: unwind array to object
         {
-            $unwind: { path: "$division", preserveNullAndEmptyArrays: true },
+            $unwind: "$division",
         },
         // Stage 3: Grouping tourType
         {
@@ -258,14 +263,22 @@ const getBookingStats = () => __awaiter(void 0, void 0, void 0, function* () {
             $project: {
                 _id: 0,
                 avgGuestCount: 1,
-            }
-        }
+            },
+        },
     ]);
-    const last7DaysBookingPromise = boooking_model_1.bookingModel.countDocuments({ createdAt: { $gte: sevenDaysAgo } });
-    const last15DaysBookingPromise = boooking_model_1.bookingModel.countDocuments({ createdAt: { $gte: fifteenDaysAgo } });
-    const last30DaysBookingPromise = boooking_model_1.bookingModel.countDocuments({ createdAt: { $gte: thirtyDaysAgo } });
-    const totalBookingByUniqeUsersPromise = boooking_model_1.bookingModel.distinct("user").then((user) => user.length);
-    const [totalBooking, totalBookingByStatus, bookingsPerTour, avgGuestCountPerbooking, last7DaysBooking, last15DaysBooking, last30DaysBooking, totalBookingByUniqeUsers] = yield Promise.all([
+    const last7DaysBookingPromise = boooking_model_1.bookingModel.countDocuments({
+        createdAt: { $gte: sevenDaysAgo },
+    });
+    const last15DaysBookingPromise = boooking_model_1.bookingModel.countDocuments({
+        createdAt: { $gte: fifteenDaysAgo },
+    });
+    const last30DaysBookingPromise = boooking_model_1.bookingModel.countDocuments({
+        createdAt: { $gte: thirtyDaysAgo },
+    });
+    const totalBookingByUniqeUsersPromise = boooking_model_1.bookingModel
+        .distinct("user")
+        .then((user) => user.length);
+    const [totalBooking, totalBookingByStatus, bookingsPerTour, avgGuestCountPerbooking, last7DaysBooking, last15DaysBooking, last30DaysBooking, totalBookingByUniqeUsers,] = yield Promise.all([
         totalBookingPromise,
         totalBookingByStatusPromise,
         bookingsPerTourPromise,
@@ -283,7 +296,7 @@ const getBookingStats = () => __awaiter(void 0, void 0, void 0, function* () {
         last7DaysBooking,
         last15DaysBooking,
         last30DaysBooking,
-        totalBookingByUniqeUsers
+        totalBookingByUniqeUsers,
     };
 });
 const getPaymentStats = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -293,8 +306,8 @@ const getPaymentStats = () => __awaiter(void 0, void 0, void 0, function* () {
         {
             $group: {
                 _id: "$status",
-                total: { $sum: 1 }
-            }
+                total: { $sum: 1 },
+            },
         },
     ]);
     const totalPaymentAmountByStatusPromise = payment_model_1.paymentModel.aggregate([
@@ -302,8 +315,8 @@ const getPaymentStats = () => __awaiter(void 0, void 0, void 0, function* () {
         {
             $group: {
                 _id: "$status",
-                totalAmount: { $sum: "$amount" }
-            }
+                totalAmount: { $sum: "$amount" },
+            },
         },
     ]);
     const avgPaymentAmountPromise = payment_model_1.paymentModel.aggregate([
@@ -311,8 +324,8 @@ const getPaymentStats = () => __awaiter(void 0, void 0, void 0, function* () {
         {
             $group: {
                 _id: null,
-                avgAmount: { $sum: "$amount" }
-            }
+                avgAmount: { $sum: "$amount" },
+            },
         },
     ]);
     const paymentGatewayDataPromise = payment_model_1.paymentModel.aggregate([
@@ -320,18 +333,24 @@ const getPaymentStats = () => __awaiter(void 0, void 0, void 0, function* () {
         {
             $group: {
                 _id: { $ifNull: ["$paymentGatewayData.status", "UNKNOWN"] },
-                count: { $sum: 1 }
-            }
-        }
+                count: { $sum: 1 },
+            },
+        },
     ]);
-    const [totalPayment, totalPaymentByStatus, totalPaymentAmountByStatus, avgPaymentAmount, paymentGatewayData] = yield Promise.all([
+    const [totalPayment, totalPaymentByStatus, totalPaymentAmountByStatus, avgPaymentAmount, paymentGatewayData,] = yield Promise.all([
         totalPaymentPromise,
         totalPaymentByStatusPromise,
         totalPaymentAmountByStatusPromise,
         avgPaymentAmountPromise,
         paymentGatewayDataPromise,
     ]);
-    return { totalPayment, totalPaymentByStatus, totalPaymentAmountByStatus, avgPaymentAmount, paymentGatewayData };
+    return {
+        totalPayment,
+        totalPaymentByStatus,
+        totalPaymentAmountByStatus,
+        avgPaymentAmount,
+        paymentGatewayData,
+    };
 });
 exports.StatsService = {
     getBookingStats,

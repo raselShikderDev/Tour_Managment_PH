@@ -120,11 +120,8 @@ const getSingelUser = (0, catchAsync_1.default)((req, res, next) => __awaiter(vo
 }));
 // Retriveve current user data
 const getMe = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.userId;
-    if (!mongoose_1.default.Types.ObjectId.isValid(id)) {
-        throw new appError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, "User id is not valid");
-    }
-    const user = yield user_services_1.userServices.getSingelUser(id);
+    const decodedToken = req.user;
+    const user = yield user_services_1.userServices.getSingelUser(decodedToken.userId);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_codes_1.StatusCodes.OK,
         success: true,
