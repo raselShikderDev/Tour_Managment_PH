@@ -20,7 +20,7 @@ const divisionSchema = new Schema<IDvision>({
 
 // Pre hook for adding division at the end of slug while creating 
 divisionSchema.pre("save", async function(next){
-    let modifiedSlug = `${this.slug}-division`
+    let modifiedSlug = `${this.name}-division`
     .split(" ")
     .join("-")
     .toLocaleLowerCase();
@@ -34,7 +34,7 @@ divisionSchema.pre("save", async function(next){
 
 // Pre hook for adding division at the end of slug while updating divisin
 divisionSchema.pre("findOneAndUpdate", async function(next){
-    const division = await this.getUpdate() as Partial<IDvision>    
+    const division = await this.getUpdate() as Partial<IDvision>   
     if(division.name){
         let modifiedSlug = `${division.name}-division`
       .split(" ")
