@@ -108,7 +108,6 @@ export const tourTypeController = {
 //Creating tour
 const createTour = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-
      const payload:ITour = {
       ...req.body,
       images:(req.files as Express.Multer.File[]).map((file)=>file.path)

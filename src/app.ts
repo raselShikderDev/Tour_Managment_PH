@@ -37,7 +37,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/v1", router);
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("Here is he Tour managment Backend");
+  res.send("Here is the Tour managment Backend");
 });
 
 // Handling Global Erro

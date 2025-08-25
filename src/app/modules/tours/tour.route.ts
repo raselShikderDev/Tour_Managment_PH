@@ -52,15 +52,15 @@ router.patch(
 // Create a tour
 router.post(
   "/create",
-  multerUpload.array("files"),
   checkAuth(role.ADMIN, role.SUPER_ADMIN),
+  multerUpload.array("files"),
   validateRequest(createTourZodSchema),
   tourController.createTour
 );
 //Get all tours
 router.get(
   "/",
-  checkAuth(role.ADMIN, role.SUPER_ADMIN),
+  // checkAuth(...Object.values(role)),
   tourController.getAllTour
 );
 //Get singel tour by slug
