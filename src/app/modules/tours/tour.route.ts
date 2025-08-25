@@ -10,10 +10,7 @@ import { checkAuth } from "../../middleware/checkAuth";
 import { role } from "../users/user.interface";
 import { multerUpload } from "../../config/multer.config";
 
-
 const router = Router();
-
-
 
 /**--------------------------- Tour types Routes -------------------------- */
 // Create a tourType
@@ -29,9 +26,9 @@ router.get(
   checkAuth(role.ADMIN, role.SUPER_ADMIN),
   tourTypeController.getAllTourType
 );
- // Get singel tourType by id
+// Get singel tourType by id
 router.get(
-  "/:id",
+  "tour-types/:id",
   checkAuth(role.ADMIN, role.SUPER_ADMIN),
   tourTypeController.getSingelTourType
 );
@@ -46,7 +43,6 @@ router.patch(
   validateRequest(createTourTypeZodSchema),
   tourTypeController.updateTourType
 );
-
 
 /**------------------------------ Tour Routes -------------------------------- */
 // Create a tour
@@ -64,7 +60,11 @@ router.get(
   tourController.getAllTour
 );
 //Get singel tour by slug
-router.get("/:slug", checkAuth(role.ADMIN, role.SUPER_ADMIN), tourController.getSingelTour)
+router.get(
+  "/:slug",
+  // checkAuth(...Object.values(role)),
+  tourController.getSingelTour
+);
 
 // Delete a tour
 router.delete(

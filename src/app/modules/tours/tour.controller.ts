@@ -45,6 +45,8 @@ const getAllTourType = catchAsync(
 const getSingelTourType = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
+        console.log("Got request in tourtype controler for singel tour by id :", id);
+
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new appError(StatusCodes.BAD_REQUEST, "TourType id is not valid");
     }
@@ -130,6 +132,8 @@ const createTour = catchAsync(
 // get singel tour by slug
 const getSingelTour = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
+    console.log("Got request in tour controler for singel tour by slug :", req.params.slug);
+    
     const slug: string = req.params.slug;
     const singelTour = await tourServices.getSingelTour(slug);
     if (Object.values(singelTour).length === 0) {
