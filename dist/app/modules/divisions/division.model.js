@@ -62,7 +62,7 @@ const divisionSchema = new mongoose_1.Schema({
 // Pre hook for adding division at the end of slug while creating 
 divisionSchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
-        let modifiedSlug = `${this.slug}-division`
+        let modifiedSlug = `${this.name}-division`
             .split(" ")
             .join("-")
             .toLocaleLowerCase();

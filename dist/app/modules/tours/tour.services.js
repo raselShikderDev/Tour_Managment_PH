@@ -85,6 +85,7 @@ exports.tourTypeServices = {
 /**------------------------------ Tour Services -------------------------------- */
 //Creating tour
 const createTour = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("In tour service - payload: ", payload);
     if (!payload) {
         throw new appError_1.default(http_status_codes_1.StatusCodes.NOT_FOUND, "Tour's infromation not found");
     }

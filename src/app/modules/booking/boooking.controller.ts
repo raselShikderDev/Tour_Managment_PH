@@ -40,11 +40,11 @@ const getAllBooking = catchAsync(
   }
 );
 
-//Retriving user Booking
-const getUserBooking= catchAsync(
+//Retriving my Booking
+const myBookings = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    
-    const booking = bookingServices.getSingelBooking("")
+    const decodedToken = req.user as JwtPayload
+    const booking = await bookingServices.myBookings(decodedToken as JwtPayload )
     sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,
@@ -112,5 +112,5 @@ export const bookingController = {
   deleteBooking,
   updateBooking,
   getSingelBooking,
-  getUserBooking,
+  myBookings,
 };

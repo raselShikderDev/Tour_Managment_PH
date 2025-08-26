@@ -2,7 +2,13 @@
 
 import { StatusCodes } from "http-status-codes";
 import appError from "../../errorHelper/appError";
-import { BOOKING_STATUS, Ibooking } from "./booking.interface";
+import {
+  BOOKING_STATUS,
+  Ibooking,
+  ISndResponseBooking,
+  ISndResponsePayment,
+  ISndResponseTour,
+} from "./booking.interface";
 import { userModel } from "../users/user.model";
 import { tourModel } from "../tours/tour.model";
 import { bookingModel } from "./boooking.model";
@@ -11,8 +17,7 @@ import { PAYMENT_STATUS } from "../payment/payment.interfce";
 import { sslServicess } from "../sslcommerz/sslcommerce.service";
 import { ISSLCommerz } from "../sslcommerz/sslcommerce.interface";
 import { generateTransactionId } from "../../utils/getTransaction";
-
-
+import { JwtPayload } from "jsonwebtoken";
 
 // Creating Booking
 const createBooking = async (payload: Partial<Ibooking>, userId: string) => {
@@ -58,14 +63,16 @@ const createBooking = async (payload: Partial<Ibooking>, userId: string) => {
       ],
       { session }
     );
-    
+
     const payment = await paymentModel.create(
-      [{
-        booking: booking[0]._id,
-        status: PAYMENT_STATUS.UNPAID,
-        transactionId: transId,
-        amount: amount,
-      }],
+      [
+        {
+          booking: booking[0]._id,
+          status: PAYMENT_STATUS.UNPAID,
+          transactionId: transId,
+          amount: amount,
+        },
+      ],
       { session }
     );
 
@@ -99,7 +106,6 @@ const createBooking = async (payload: Partial<Ibooking>, userId: string) => {
 
     const sslPayment = await sslServicess.sslPaymentInit(sslPaylaod);
     // console.log("sslPayment: ", sslPayment);
-    
 
     await session.commitTransaction();
     session.endSession();
@@ -112,12 +118,12 @@ const createBooking = async (payload: Partial<Ibooking>, userId: string) => {
     await session.abortTransaction();
     session.endSession();
     throw error;
-  } finally{
+  } finally {
     session.endSession();
   }
 };
 
-// Retriving all tours
+// Retriving all booking
 const getAllBooking = async () => {
   return {
     meta: {
@@ -170,10 +176,40 @@ const updateBooking = async (id: string, payload: Partial<Ibooking>) => {
   return updatedNewBooking;
 };
 
+// get my bookings
+const myBookings = async (user: JwtPayload) => {
+  const myAllBookings = await bookingModel
+    .find({ user: user.userId })
+    .populate<{ tour: ISndResponseTour }>(
+      "tour",
+      "title costForm location startDate"
+    )
+    .populate<{ payment: ISndResponsePayment }>("payment", "amount")
+    .lean(); // converts Mongoose documents to plain JS objects
+
+  if (!myAllBookings || myAllBookings.length === 0) {
+    throw new appError(StatusCodes.BAD_REQUEST, "Bookings not made yet");
+  }
+
+  // Map over the bookings
+  const bookings: ISndResponseBooking[] = myAllBookings.map((booking) => ({
+    _id: booking._id,
+    user: booking.user,
+    tour: booking.tour,
+    guestCount: booking.guestCount,
+    status: booking.status,
+    payment: booking.payment,
+    startDate: booking.tour.startDate,
+  }));
+
+  return bookings;
+};
+
 export const bookingServices = {
   createBooking,
   getAllBooking,
   deleteBooking,
   updateBooking,
   getSingelBooking,
+  myBookings,
 };
