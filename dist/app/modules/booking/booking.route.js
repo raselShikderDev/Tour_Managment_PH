@@ -13,7 +13,7 @@ router.post("/create", (0, checkAuth_1.checkAuth)(...Object.values(user_interfac
 //Get all bookingss
 router.get("/", (0, checkAuth_1.checkAuth)(user_interface_1.role.ADMIN, user_interface_1.role.SUPER_ADMIN), boooking_controller_1.bookingController.getAllBooking);
 //Get user bookings  
-router.get("/my-booking", (0, checkAuth_1.checkAuth)(...Object.values(user_interface_1.role)), boooking_controller_1.bookingController.getUserBooking);
+router.get("/my-booking", (0, checkAuth_1.checkAuth)(...Object.values(user_interface_1.role)), boooking_controller_1.bookingController.myBookings);
 //Get singel bookings by id
 router.get("/:bookingid", (0, checkAuth_1.checkAuth)(...Object.values(user_interface_1.role)), boooking_controller_1.bookingController.getSingelBooking);
 // Delete a bookings

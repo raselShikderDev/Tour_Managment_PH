@@ -10,7 +10,7 @@ const division_zodValidation_1 = require("./division.zodValidation");
 const multer_config_1 = require("../../config/multer.config");
 const router = (0, express_1.Router)();
 router.post("/create", multer_config_1.multerUpload.single("file"), (0, checkAuth_1.checkAuth)(user_interface_1.role.ADMIN, user_interface_1.role.SUPER_ADMIN), (0, validateRequest_1.validateRequest)(division_zodValidation_1.createDivisionZodValidation), division_controller_1.divisionController.CreateDivision);
-router.get("/", (0, checkAuth_1.checkAuth)(user_interface_1.role.ADMIN, user_interface_1.role.SUPER_ADMIN), division_controller_1.divisionController.getAllDivisions);
+router.get("/", (0, checkAuth_1.checkAuth)(...Object.values(user_interface_1.role)), division_controller_1.divisionController.getAllDivisions);
 router.get("/:slug", (0, checkAuth_1.checkAuth)(user_interface_1.role.ADMIN, user_interface_1.role.SUPER_ADMIN), division_controller_1.divisionController.getSingelDivision);
 router.delete("/:id", (0, checkAuth_1.checkAuth)(user_interface_1.role.ADMIN, user_interface_1.role.SUPER_ADMIN), division_controller_1.divisionController.deleteDivision);
 router.patch("/:id", multer_config_1.multerUpload.single("file"), (0, checkAuth_1.checkAuth)(user_interface_1.role.ADMIN, user_interface_1.role.SUPER_ADMIN), (0, validateRequest_1.validateRequest)(division_zodValidation_1.updateDivisionZodValidation), division_controller_1.divisionController.updateDivision);

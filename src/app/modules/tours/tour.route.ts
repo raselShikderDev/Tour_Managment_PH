@@ -23,13 +23,13 @@ router.post(
 // Get all touType
 router.get(
   "/tour-types",
-  checkAuth(role.ADMIN, role.SUPER_ADMIN),
+  checkAuth(...Object.values(role)),
   tourTypeController.getAllTourType
 );
 // Get singel tourType by id
 router.get(
   "tour-types/:id",
-  checkAuth(role.ADMIN, role.SUPER_ADMIN),
+  // checkAuth(role.ADMIN, role.SUPER_ADMIN),
   tourTypeController.getSingelTourType
 );
 router.delete(

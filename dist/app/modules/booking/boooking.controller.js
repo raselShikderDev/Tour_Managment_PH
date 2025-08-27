@@ -42,9 +42,10 @@ const getAllBooking = (0, catchAsync_1.default)((req, res, next) => __awaiter(vo
         data: allBooking,
     });
 }));
-//Retriving user Booking
-const getUserBooking = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const booking = booking_services_1.bookingServices.getSingelBooking("");
+//Retriving my Booking
+const myBookings = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const decodedToken = req.user;
+    const booking = yield booking_services_1.bookingServices.myBookings(decodedToken);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_codes_1.StatusCodes.OK,
         success: true,
@@ -100,5 +101,5 @@ exports.bookingController = {
     deleteBooking,
     updateBooking,
     getSingelBooking,
-    getUserBooking,
+    myBookings,
 };
