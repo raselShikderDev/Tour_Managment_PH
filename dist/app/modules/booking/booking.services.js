@@ -48,12 +48,14 @@ const createBooking = (payload, userId) => __awaiter(void 0, void 0, void 0, fun
         const booking = yield boooking_model_1.bookingModel.create([
             Object.assign({ user: userId, status: booking_interface_1.BOOKING_STATUS.PENDING }, payload),
         ], { session });
-        const payment = yield payment_model_1.paymentModel.create([{
+        const payment = yield payment_model_1.paymentModel.create([
+            {
                 booking: booking[0]._id,
                 status: payment_interfce_1.PAYMENT_STATUS.UNPAID,
                 transactionId: transId,
                 amount: amount,
-            }], { session });
+            },
+        ], { session });
         const updatedBooking = yield boooking_model_1.bookingModel
             .findByIdAndUpdate(booking[0]._id, { payment: payment[0]._id }, { new: true, runValidators: true, session })
             .populate("user", "name email phone address")
@@ -93,7 +95,7 @@ const createBooking = (payload, userId) => __awaiter(void 0, void 0, void 0, fun
         session.endSession();
     }
 });
-// Retriving all tours
+// Retriving all booking
 const getAllBooking = () => __awaiter(void 0, void 0, void 0, function* () {
     return {
         meta: {
@@ -131,10 +133,33 @@ const updateBooking = (id, payload) => __awaiter(void 0, void 0, void 0, functio
         throw new appError_1.default(http_status_codes_1.StatusCodes.NOT_FOUND, "Booking not found");
     return updatedNewBooking;
 });
+// get my bookings
+const myBookings = (user) => __awaiter(void 0, void 0, void 0, function* () {
+    const myAllBookings = yield boooking_model_1.bookingModel
+        .find({ user: user.userId })
+        .populate("tour", "title costForm location startDate")
+        .populate("payment", "amount")
+        .lean(); // converts Mongoose documents to plain JS objects
+    if (!myAllBookings || myAllBookings.length === 0) {
+        throw new appError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, "Bookings not made yet");
+    }
+    // Map over the bookings
+    const bookings = myAllBookings.map((booking) => ({
+        _id: booking._id,
+        user: booking.user,
+        tour: booking.tour,
+        guestCount: booking.guestCount,
+        status: booking.status,
+        payment: booking.payment,
+        startDate: booking.tour.startDate,
+    }));
+    return bookings;
+});
 exports.bookingServices = {
     createBooking,
     getAllBooking,
     deleteBooking,
     updateBooking,
     getSingelBooking,
+    myBookings,
 };

@@ -45,6 +45,7 @@ const getAllTourType = catchAsync(
 const getSingelTourType = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
+
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new appError(StatusCodes.BAD_REQUEST, "TourType id is not valid");
     }
@@ -108,7 +109,6 @@ export const tourTypeController = {
 //Creating tour
 const createTour = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-
      const payload:ITour = {
       ...req.body,
       images:(req.files as Express.Multer.File[]).map((file)=>file.path)
@@ -131,6 +131,7 @@ const createTour = catchAsync(
 // get singel tour by slug
 const getSingelTour = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
+    
     const slug: string = req.params.slug;
     const singelTour = await tourServices.getSingelTour(slug);
     if (Object.values(singelTour).length === 0) {

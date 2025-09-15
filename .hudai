@@ -1,0 +1,16 @@
+{
+            _id: 68ae1026e2941524e7957cd9,
+            user: 68972656c39528daa0a108bc,
+            tour: {
+                _id: 68ac3a840eb001bfaddaf078,
+                title: Wildlife Expedition test 1,
+                location: Sundarbans, Bangladesh,
+                costForm: 1300
+            },
+            guestCount: 2,
+            status: COMPLETED,
+            createdAt: 2025-08-26T19:51:02.902Z,
+            updatedAt: 2025-08-26T19:51:09.337Z,
+            payment: 68ae1027e2941524e7957cdb
+            startDate: 2025-08-25T17:48:05.000Z
+        };

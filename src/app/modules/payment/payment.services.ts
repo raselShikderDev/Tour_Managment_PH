@@ -232,6 +232,35 @@ const cancelPayment = async (query: Record<string, string>) => {
 };
 
 
+
+// Get all payments only admin are allowed
+// const getAllPayments = async()=>{
+//   const allPaymets = await paymentModel.find()
+//   if (!allPaymets || allPaymets === null) {
+//     throw new appError(
+//       StatusCodes.BAD_REQUEST,
+//       "No Payment completed yet"
+//     );
+//   }
+
+//   return  allPaymets
+// }
+// Get all payments only admins are allowed
+// const getSingelPayments = async(paymentId:string)=>{
+//   const allPaymets = await paymentModel.findById(paymentId)
+//   if (!allPaymets ) {
+//     throw new appError(
+//       StatusCodes.BAD_REQUEST,
+//       "Invalid Payment id"
+//     );
+//   }
+
+//   return  allPaymets
+// }
+
+
+
+
 // Get singel invoice of an payment
 const SinglepaymentInvoiceUrl = async (paymentId: string, decodedToken:JwtPayload) => {
   

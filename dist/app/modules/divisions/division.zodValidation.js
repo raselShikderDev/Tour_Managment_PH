@@ -11,7 +11,7 @@ exports.createDivisionZodValidation = zod_1.default.object({
         .min(1, { message: "name must be at least one character" }),
     slug: zod_1.default
         .string({ invalid_type_error: "slug must be a string" })
-        .min(1, { message: "slug must be at least one character" }),
+        .min(1, { message: "slug must be at least one character" }).optional(),
     thumbnail: zod_1.default.string().optional(),
     description: zod_1.default.string().optional(),
 });

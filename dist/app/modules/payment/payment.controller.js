@@ -92,6 +92,7 @@ exports.paymentController = {
     failPayment,
     cancelPayment,
     initPayment,
+    validatePayment,
     SinglepaymentInvoiceUrl,
     invoicesAllpayment,
 };

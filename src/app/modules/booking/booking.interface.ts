@@ -18,3 +18,26 @@ export interface Ibooking{
     status: BOOKING_STATUS,
     createdAt?:Date;
 }
+
+
+export interface ISndResponseTour {
+  title: string;
+  costForm: number;
+  location: string;
+  startDate: Date;
+}
+
+export interface ISndResponsePayment {
+  _id: Types.ObjectId;
+  amount: number;
+}
+
+export interface ISndResponseBooking {
+  _id: Types.ObjectId;
+  user: Types.ObjectId;
+  tour: ISndResponseTour;
+  guestCount: number;
+  status: string;
+  payment: ISndResponsePayment;
+  startDate: Date;
+}

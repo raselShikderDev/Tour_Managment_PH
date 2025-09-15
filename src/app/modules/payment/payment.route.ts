@@ -7,12 +7,15 @@ const router = Router();
 router.post("/success", paymentController.successPayment);
 router.post("/fail", paymentController.failPayment);
 router.post("/cancel", paymentController.cancelPayment);
+router.post("/cancel", paymentController.cancelPayment);
+router.post("/validate-payment", paymentController.validatePayment);
 router.post("/init-payment/:bookingId", paymentController.initPayment);
 router.get(
   "/all-invoices",
   checkAuth(role.ADMIN, role.SUPER_ADMIN),
   paymentController.invoicesAllpayment
 );
+
 router.get(
   "/invoices/:paymentid",
   checkAuth(...Object.values(role)),

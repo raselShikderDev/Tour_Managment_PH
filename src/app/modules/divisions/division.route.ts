@@ -20,7 +20,7 @@ router.post(
 );
 router.get(
   "/",
-  checkAuth(role.ADMIN, role.SUPER_ADMIN),
+  checkAuth(...Object.values(role)),
   divisionController.getAllDivisions
 );
 router.get(

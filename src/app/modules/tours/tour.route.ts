@@ -10,10 +10,7 @@ import { checkAuth } from "../../middleware/checkAuth";
 import { role } from "../users/user.interface";
 import { multerUpload } from "../../config/multer.config";
 
-
 const router = Router();
-
-
 
 /**--------------------------- Tour types Routes -------------------------- */
 // Create a tourType
@@ -26,13 +23,13 @@ router.post(
 // Get all touType
 router.get(
   "/tour-types",
-  checkAuth(role.ADMIN, role.SUPER_ADMIN),
+  checkAuth(...Object.values(role)),
   tourTypeController.getAllTourType
 );
- // Get singel tourType by id
+// Get singel tourType by id
 router.get(
-  "/:id",
-  checkAuth(role.ADMIN, role.SUPER_ADMIN),
+  "tour-types/:id",
+  // checkAuth(role.ADMIN, role.SUPER_ADMIN),
   tourTypeController.getSingelTourType
 );
 router.delete(
@@ -47,24 +44,27 @@ router.patch(
   tourTypeController.updateTourType
 );
 
-
 /**------------------------------ Tour Routes -------------------------------- */
 // Create a tour
 router.post(
   "/create",
-  multerUpload.array("files"),
   checkAuth(role.ADMIN, role.SUPER_ADMIN),
+  multerUpload.array("files"),
   validateRequest(createTourZodSchema),
   tourController.createTour
 );
 //Get all tours
 router.get(
   "/",
-  checkAuth(role.ADMIN, role.SUPER_ADMIN),
+  // checkAuth(...Object.values(role)),
   tourController.getAllTour
 );
 //Get singel tour by slug
-router.get("/:slug", checkAuth(role.ADMIN, role.SUPER_ADMIN), tourController.getSingelTour)
+router.get(
+  "/:slug",
+  // checkAuth(...Object.values(role)),
+  tourController.getSingelTour
+);
 
 // Delete a tour
 router.delete(

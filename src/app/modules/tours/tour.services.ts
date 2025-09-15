@@ -97,6 +97,8 @@ export const tourTypeServices = {
 /**------------------------------ Tour Services -------------------------------- */
 //Creating tour
 const createTour = async (payload: ITour) => {
+  console.log("In tour service - payload: ", payload);
+
   if (!payload) {
     throw new appError(StatusCodes.NOT_FOUND, "Tour's infromation not found");
   }

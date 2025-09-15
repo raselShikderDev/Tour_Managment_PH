@@ -8,12 +8,13 @@ import { StatusCodes } from "http-status-codes";
 import sendResponse from "../../utils/sendResponse";
 import { envVars } from "../../config/env";
 import mongoose from "mongoose";
-import { divisionModel } from "./division.model";
+
+
 
 // Creating divisions
 const CreateDivision = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-
+    
     const payload :IDvision = {
       ...req.body,
       thumbnail:req.file?.path

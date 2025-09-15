@@ -13,18 +13,24 @@ const router = (0, express_1.Router)();
 // Create a tourType
 router.post("/create-tour-type", (0, checkAuth_1.checkAuth)(user_interface_1.role.ADMIN, user_interface_1.role.SUPER_ADMIN), (0, validateRequest_1.validateRequest)(tour_zodValidation_1.createTourTypeZodSchema), tour_controller_1.tourTypeController.createTourType);
 // Get all touType
-router.get("/tour-types", (0, checkAuth_1.checkAuth)(user_interface_1.role.ADMIN, user_interface_1.role.SUPER_ADMIN), tour_controller_1.tourTypeController.getAllTourType);
+router.get("/tour-types", (0, checkAuth_1.checkAuth)(...Object.values(user_interface_1.role)), tour_controller_1.tourTypeController.getAllTourType);
 // Get singel tourType by id
-router.get("/:id", (0, checkAuth_1.checkAuth)(user_interface_1.role.ADMIN, user_interface_1.role.SUPER_ADMIN), tour_controller_1.tourTypeController.getSingelTourType);
+router.get("tour-types/:id", 
+// checkAuth(role.ADMIN, role.SUPER_ADMIN),
+tour_controller_1.tourTypeController.getSingelTourType);
 router.delete("/tour-types/:id", (0, checkAuth_1.checkAuth)(user_interface_1.role.ADMIN, user_interface_1.role.SUPER_ADMIN), tour_controller_1.tourTypeController.deleteTourType);
 router.patch("/tour-types/:id", (0, checkAuth_1.checkAuth)(user_interface_1.role.ADMIN, user_interface_1.role.SUPER_ADMIN), (0, validateRequest_1.validateRequest)(tour_zodValidation_1.createTourTypeZodSchema), tour_controller_1.tourTypeController.updateTourType);
 /**------------------------------ Tour Routes -------------------------------- */
 // Create a tour
-router.post("/create", multer_config_1.multerUpload.array("files"), (0, checkAuth_1.checkAuth)(user_interface_1.role.ADMIN, user_interface_1.role.SUPER_ADMIN), (0, validateRequest_1.validateRequest)(tour_zodValidation_1.createTourZodSchema), tour_controller_1.tourController.createTour);
+router.post("/create", (0, checkAuth_1.checkAuth)(user_interface_1.role.ADMIN, user_interface_1.role.SUPER_ADMIN), multer_config_1.multerUpload.array("files"), (0, validateRequest_1.validateRequest)(tour_zodValidation_1.createTourZodSchema), tour_controller_1.tourController.createTour);
 //Get all tours
-router.get("/", (0, checkAuth_1.checkAuth)(user_interface_1.role.ADMIN, user_interface_1.role.SUPER_ADMIN), tour_controller_1.tourController.getAllTour);
+router.get("/", 
+// checkAuth(...Object.values(role)),
+tour_controller_1.tourController.getAllTour);
 //Get singel tour by slug
-router.get("/:slug", (0, checkAuth_1.checkAuth)(user_interface_1.role.ADMIN, user_interface_1.role.SUPER_ADMIN), tour_controller_1.tourController.getSingelTour);
+router.get("/:slug", 
+// checkAuth(...Object.values(role)),
+tour_controller_1.tourController.getSingelTour);
 // Delete a tour
 router.delete("/:id", (0, checkAuth_1.checkAuth)(user_interface_1.role.ADMIN, user_interface_1.role.SUPER_ADMIN), tour_controller_1.tourController.deleteTour);
 // Update a tour

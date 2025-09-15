@@ -34,7 +34,7 @@ app.set("trust proxy", 1);
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use("/api/v1", routes_1.router);
 app.get("/", (req, res) => {
-    res.send("Here is he Tour managment Backend");
+    res.send("Here is the Tour managment Backend");
 });
 // Handling Global Erro
 app.use(globalError_1.globalError);
