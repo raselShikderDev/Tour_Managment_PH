@@ -8,7 +8,6 @@
     "dev": "ts-node-dev --respawn --transpile-only ./src/server.ts",
     "build":"npm install --force && tsc",
     "lint": "npx eslint ./src"
-
   },
   "repository": {
     "type": "git",

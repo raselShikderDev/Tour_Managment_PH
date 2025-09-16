@@ -97,18 +97,17 @@ passport_1.default.use(new passport_google_oauth20_1.Strategy({
         return done(error);
     }
 })));
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-passport_1.default.serializeUser((user, done) => {
-    done(null, user._id);
-});
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-passport_1.default.deserializeUser((id, done) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const user = yield user_model_1.userModel.findById(id);
-        done(null, user);
-    }
-    catch (error) {
-        console.log(error);
-        done(error);
-    }
-}));
+// // eslint-disable-next-line @typescript-eslint/no-explicit-any
+// passport.serializeUser((user: any, done: (err: any, id?: unknown) => void) => {
+//   done(null, user._id);
+// });
+// // eslint-disable-next-line @typescript-eslint/no-explicit-any
+// passport.deserializeUser(async (id: string, done: any) => {
+//   try {
+//     const user = await userModel.findById(id);
+//     done(null, user);
+//   } catch (error) {
+//     console.log(error);
+//     done(error);
+//   }
+// });
