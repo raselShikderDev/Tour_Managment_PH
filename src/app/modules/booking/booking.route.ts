@@ -27,6 +27,10 @@ router.get(
 
 //Get user bookings  
 router.get("/my-booking", checkAuth(...Object.values(role)), bookingController.myBookings)
+//Get user completed bookings  
+router.get("/completed-booking", checkAuth(...Object.values(role)), bookingController.myCompletedBookings)
+//Get user pending bookings  
+router.get("/pending-booking", checkAuth(...Object.values(role)), bookingController.myPendingsBookings)
 
 //Get singel bookings by id
 router.get("/:bookingid", checkAuth(...Object.values(role)), bookingController.getSingelBooking)

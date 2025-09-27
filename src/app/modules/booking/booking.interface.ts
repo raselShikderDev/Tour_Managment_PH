@@ -1,6 +1,8 @@
 // User -> Booking (Pending) -> Payment (unpaid) -> SSLCommerz -> Booking status chnage to Confrim -> Payment status chnage to paid ->
 
 import { Types } from "mongoose";
+import { ITour } from "../tours/tour.interface";
+import { IPayment } from "../payment/payment.interfce";
 
 
 export enum BOOKING_STATUS {
@@ -35,9 +37,9 @@ export interface ISndResponsePayment {
 export interface ISndResponseBooking {
   _id: Types.ObjectId;
   user: Types.ObjectId;
-  tour: ISndResponseTour;
+  tour: ITour;
   guestCount: number;
   status: string;
-  payment: ISndResponsePayment;
-  startDate: Date;
+  payment: IPayment;
+  startDate?: Date;
 }

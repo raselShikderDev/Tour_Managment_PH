@@ -13,11 +13,12 @@ import { userModel } from "../users/user.model";
 import { tourModel } from "../tours/tour.model";
 import { bookingModel } from "./boooking.model";
 import { paymentModel } from "../payment/payment.model";
-import { PAYMENT_STATUS } from "../payment/payment.interfce";
+import { IPayment, PAYMENT_STATUS } from "../payment/payment.interfce";
 import { sslServicess } from "../sslcommerz/sslcommerce.service";
 import { ISSLCommerz } from "../sslcommerz/sslcommerce.interface";
 import { generateTransactionId } from "../../utils/getTransaction";
 import { JwtPayload } from "jsonwebtoken";
+import { ITour } from "../tours/tour.interface";
 
 // Creating Booking
 const createBooking = async (payload: Partial<Ibooking>, userId: string) => {
@@ -180,15 +181,37 @@ const updateBooking = async (id: string, payload: Partial<Ibooking>) => {
 const myBookings = async (user: JwtPayload) => {
   const myAllBookings = await bookingModel
     .find({ user: user.userId })
-    .populate<{ tour: ISndResponseTour }>(
-      "tour",
-      "title costForm location startDate"
-    )
-    .populate<{ payment: ISndResponsePayment }>("payment", "amount")
-    .lean(); // converts Mongoose documents to plain JS objects
+    .populate<{ tour: ITour }>("tour")
+    .populate<{ payment: IPayment }>("payment");
 
   if (!myAllBookings || myAllBookings.length === 0) {
     throw new appError(StatusCodes.BAD_REQUEST, "Bookings not made yet");
+  }
+
+  // Map over the bookings
+  // Map over the bookings
+  const bookings: ISndResponseBooking[] = myAllBookings.map((booking) => ({
+    _id: booking._id,
+    user: booking.user,
+    tour: booking.tour,
+    guestCount: booking.guestCount,
+    status: booking.status,
+    payment: booking.payment,
+    startDate: booking.tour?.startDate,
+  }));
+
+  return bookings;
+};
+
+// get my completed bookings
+const myCompletedBookings = async (user: JwtPayload) => {
+  const myAllBookings = await bookingModel
+    .find({ user: user.userId, status: BOOKING_STATUS.COMPLETED })
+    .populate<{ tour: ITour }>("tour")
+    .populate<{ payment: IPayment }>("payment");
+
+  if (!myAllBookings || myAllBookings.length === 0) {
+    throw new appError(StatusCodes.BAD_REQUEST, "No completed Booking found");
   }
 
   // Map over the bookings
@@ -199,7 +222,33 @@ const myBookings = async (user: JwtPayload) => {
     guestCount: booking.guestCount,
     status: booking.status,
     payment: booking.payment,
-    startDate: booking.tour.startDate,
+    startDate: booking.tour?.startDate,
+  }));
+
+  return bookings;
+};
+
+// get my Pending bookings
+const myPendingsBookings = async (user: JwtPayload) => {
+  const myAllBookings = await bookingModel
+    .find({ user: user.userId, status: "PENDING" })
+    .populate<{ tour: ITour }>("tour")
+    .populate<{ payment: IPayment }>("payment");
+  console.log("my All penings Bookings", myAllBookings);
+
+  if (!myAllBookings || myAllBookings.length === 0) {
+    throw new appError(StatusCodes.BAD_REQUEST, "No Pending Booking found");
+  }
+
+  // Map over the bookings
+  const bookings: ISndResponseBooking[] = myAllBookings.map((booking) => ({
+    _id: booking._id,
+    user: booking.user,
+    tour: booking.tour,
+    guestCount: booking.guestCount,
+    status: booking.status,
+    payment: booking.payment,
+    startDate: booking.tour?.startDate,
   }));
 
   return bookings;
@@ -212,4 +261,6 @@ export const bookingServices = {
   updateBooking,
   getSingelBooking,
   myBookings,
+  myPendingsBookings,
+  myCompletedBookings,
 };
