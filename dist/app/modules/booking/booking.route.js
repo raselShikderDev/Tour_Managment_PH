@@ -14,6 +14,10 @@ router.post("/create", (0, checkAuth_1.checkAuth)(...Object.values(user_interfac
 router.get("/", (0, checkAuth_1.checkAuth)(user_interface_1.role.ADMIN, user_interface_1.role.SUPER_ADMIN), boooking_controller_1.bookingController.getAllBooking);
 //Get user bookings  
 router.get("/my-booking", (0, checkAuth_1.checkAuth)(...Object.values(user_interface_1.role)), boooking_controller_1.bookingController.myBookings);
+//Get user completed bookings  
+router.get("/completed-booking", (0, checkAuth_1.checkAuth)(...Object.values(user_interface_1.role)), boooking_controller_1.bookingController.myCompletedBookings);
+//Get user pending bookings  
+router.get("/pending-booking", (0, checkAuth_1.checkAuth)(...Object.values(user_interface_1.role)), boooking_controller_1.bookingController.myPendingsBookings);
 //Get singel bookings by id
 router.get("/:bookingid", (0, checkAuth_1.checkAuth)(...Object.values(user_interface_1.role)), boooking_controller_1.bookingController.getSingelBooking);
 // Delete a bookings

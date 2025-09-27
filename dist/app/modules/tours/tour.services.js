@@ -104,7 +104,7 @@ const createTour = (payload) => __awaiter(void 0, void 0, void 0, function* () {
 });
 // Get singel a Tour by slug
 const getSingelTour = (slug) => __awaiter(void 0, void 0, void 0, function* () {
-    const tour = yield tour_model_1.tourModel.findOne({ slug });
+    const tour = yield tour_model_1.tourModel.findOne({ slug }).populate("division tourType");
     if (tour === null)
         throw new appError_1.default(http_status_codes_1.StatusCodes.NOT_FOUND, "Tour not found");
     return tour;

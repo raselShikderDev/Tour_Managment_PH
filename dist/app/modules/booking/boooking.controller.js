@@ -53,6 +53,28 @@ const myBookings = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 
         data: booking,
     });
 }));
+//Retriving Completed my Booking
+const myCompletedBookings = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const decodedToken = req.user;
+    const booking = yield booking_services_1.bookingServices.myBookings(decodedToken);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_codes_1.StatusCodes.OK,
+        success: true,
+        message: "Successfully retrived completed bookings",
+        data: booking,
+    });
+}));
+//Retriving my ending Booking
+const myPendingsBookings = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const decodedToken = req.user;
+    const booking = yield booking_services_1.bookingServices.myBookings(decodedToken);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_codes_1.StatusCodes.OK,
+        success: true,
+        message: "Successfully retrived pendings bookings",
+        data: booking,
+    });
+}));
 //Retriving a Booking
 const getSingelBooking = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
@@ -102,4 +124,6 @@ exports.bookingController = {
     updateBooking,
     getSingelBooking,
     myBookings,
+    myPendingsBookings,
+    myCompletedBookings,
 };
