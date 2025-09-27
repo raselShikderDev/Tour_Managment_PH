@@ -122,7 +122,7 @@ const createTour = async (payload: ITour) => {
 
 // Get singel a Tour by slug
 const getSingelTour = async (slug: string) => {
-  const tour = await tourModel.findOne({ slug });
+  const tour = await tourModel.findOne({ slug }).populate("division tourType");
   if (tour === null)
     throw new appError(StatusCodes.NOT_FOUND, "Tour not found");
   return tour;
@@ -264,8 +264,9 @@ const updateTour = async (id: string, payload: Partial<ITour>) => {
     new: true,
     runValidators: true,
   });
-  if (!updatedNewTour)
-   { throw new appError(StatusCodes.NOT_FOUND, "Tour not found");}
+  if (!updatedNewTour) {
+    throw new appError(StatusCodes.NOT_FOUND, "Tour not found");
+  }
   if (
     payload.deleteImages &&
     payload.deleteImages.length > 0 &&

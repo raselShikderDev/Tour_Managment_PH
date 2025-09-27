@@ -137,22 +137,74 @@ const updateBooking = (id, payload) => __awaiter(void 0, void 0, void 0, functio
 const myBookings = (user) => __awaiter(void 0, void 0, void 0, function* () {
     const myAllBookings = yield boooking_model_1.bookingModel
         .find({ user: user.userId })
-        .populate("tour", "title costForm location startDate")
-        .populate("payment", "amount")
-        .lean(); // converts Mongoose documents to plain JS objects
+        .populate("tour")
+        .populate("payment");
     if (!myAllBookings || myAllBookings.length === 0) {
         throw new appError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, "Bookings not made yet");
     }
     // Map over the bookings
-    const bookings = myAllBookings.map((booking) => ({
-        _id: booking._id,
-        user: booking.user,
-        tour: booking.tour,
-        guestCount: booking.guestCount,
-        status: booking.status,
-        payment: booking.payment,
-        startDate: booking.tour.startDate,
-    }));
+    // Map over the bookings
+    const bookings = myAllBookings.map((booking) => {
+        var _a;
+        return ({
+            _id: booking._id,
+            user: booking.user,
+            tour: booking.tour,
+            guestCount: booking.guestCount,
+            status: booking.status,
+            payment: booking.payment,
+            startDate: (_a = booking.tour) === null || _a === void 0 ? void 0 : _a.startDate,
+        });
+    });
+    return bookings;
+});
+// get my completed bookings
+const myCompletedBookings = (user) => __awaiter(void 0, void 0, void 0, function* () {
+    const myAllBookings = yield boooking_model_1.bookingModel
+        .find({ user: user.userId, status: booking_interface_1.BOOKING_STATUS.COMPLETED })
+        .populate("tour")
+        .populate("payment");
+    if (!myAllBookings || myAllBookings.length === 0) {
+        throw new appError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, "No completed Booking found");
+    }
+    // Map over the bookings
+    const bookings = myAllBookings.map((booking) => {
+        var _a;
+        return ({
+            _id: booking._id,
+            user: booking.user,
+            tour: booking.tour,
+            guestCount: booking.guestCount,
+            status: booking.status,
+            payment: booking.payment,
+            startDate: (_a = booking.tour) === null || _a === void 0 ? void 0 : _a.startDate,
+        });
+    });
+    return bookings;
+});
+// get my Pending bookings
+const myPendingsBookings = (user) => __awaiter(void 0, void 0, void 0, function* () {
+    const myAllBookings = yield boooking_model_1.bookingModel
+        .find({ user: user.userId, status: "PENDING" })
+        .populate("tour")
+        .populate("payment");
+    console.log("my All penings Bookings", myAllBookings);
+    if (!myAllBookings || myAllBookings.length === 0) {
+        throw new appError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, "No Pending Booking found");
+    }
+    // Map over the bookings
+    const bookings = myAllBookings.map((booking) => {
+        var _a;
+        return ({
+            _id: booking._id,
+            user: booking.user,
+            tour: booking.tour,
+            guestCount: booking.guestCount,
+            status: booking.status,
+            payment: booking.payment,
+            startDate: (_a = booking.tour) === null || _a === void 0 ? void 0 : _a.startDate,
+        });
+    });
     return bookings;
 });
 exports.bookingServices = {
@@ -162,4 +214,6 @@ exports.bookingServices = {
     updateBooking,
     getSingelBooking,
     myBookings,
+    myPendingsBookings,
+    myCompletedBookings,
 };

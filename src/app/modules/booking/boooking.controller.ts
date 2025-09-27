@@ -53,6 +53,32 @@ const myBookings = catchAsync(
     });
   }
 );
+//Retriving Completed my Booking
+const myCompletedBookings = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const decodedToken = req.user as JwtPayload
+    const booking = await bookingServices.myBookings(decodedToken as JwtPayload )
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Successfully retrived completed bookings",
+      data: booking,
+    });
+  }
+);
+//Retriving my ending Booking
+const myPendingsBookings = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const decodedToken = req.user as JwtPayload
+    const booking = await bookingServices.myBookings(decodedToken as JwtPayload )
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Successfully retrived pendings bookings",
+      data: booking,
+    });
+  }
+);
 
 //Retriving a Booking
 const getSingelBooking= catchAsync(
@@ -113,4 +139,6 @@ export const bookingController = {
   updateBooking,
   getSingelBooking,
   myBookings,
+  myPendingsBookings,
+  myCompletedBookings,
 };

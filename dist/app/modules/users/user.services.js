@@ -109,9 +109,12 @@ const deleteuser = (userid) => __awaiter(void 0, void 0, void 0, function* () {
 // Get my profile's information
 const getMe = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield user_model_1.userModel.findById(id).select("-password");
+    // eslint-disable-next-line no-console
+    console.log(user);
     if (user === null)
         throw new appError_1.default(http_status_codes_1.StatusCodes.NOT_FOUND, "Your profile's information not found");
-    return user;
+    const plainUser = user.toObject();
+    return Object.assign(Object.assign({}, plainUser), { password: "" });
 });
 exports.userServices = {
     createUser,

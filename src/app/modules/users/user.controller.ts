@@ -137,8 +137,11 @@ const getSingelUser = catchAsync(
 const getMe = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
      const decodedToken = req.user as JwtPayload
-    
+      // eslint-disable-next-line no-console
+      console.log("Got request");
+
    const user = await userServices.getSingelUser(decodedToken.userId);
+
     sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,

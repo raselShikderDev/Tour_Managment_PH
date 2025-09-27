@@ -6,11 +6,10 @@ import bcrypt from "bcrypt";
 import { envVars } from "../../config/env";
 import { JwtPayload } from "jsonwebtoken";
 
-
 // Create a user
 const createUser = async (payload: Partial<IUser>) => {
   const { email, password, ...rest } = payload;
-  
+
   const existsUser = await userModel.findOne({ email });
   if (existsUser)
     throw new appError(StatusCodes.BAD_REQUEST, "User already exists");
@@ -46,9 +45,10 @@ const getAllUser = async () => {
 };
 
 // Get a singel User
-const getSingelUser = async (id:string)=>{
+const getSingelUser = async (id: string) => {
   const user = await userModel.findById(id);
-  if (user === null) throw new appError(StatusCodes.NOT_FOUND, "User not found");
+  if (user === null)
+    throw new appError(StatusCodes.NOT_FOUND, "User not found");
   return user;
 };
 
@@ -58,10 +58,12 @@ const updateUser = async (
   payload: Partial<IUser>,
   decodedToken: JwtPayload
 ) => {
-
-  if (decodedToken.role ===role.USER || decodedToken.role === role.GUIDE) {
+  if (decodedToken.role === role.USER || decodedToken.role === role.GUIDE) {
     if (decodedToken.userId !== userId) {
-      throw new appError(StatusCodes.UNAUTHORIZED, "You are not authorized to update")
+      throw new appError(
+        StatusCodes.UNAUTHORIZED,
+        "You are not authorized to update"
+      );
     }
   }
 
@@ -69,10 +71,13 @@ const updateUser = async (
   if (!userExist) throw new appError(StatusCodes.NOT_FOUND, "User not found");
 
   if (decodedToken.role === role.ADMIN && userExist.role === role.SUPER_ADMIN) {
-    throw new appError(StatusCodes.UNAUTHORIZED, "You are not allowed to update")
+    throw new appError(
+      StatusCodes.UNAUTHORIZED,
+      "You are not allowed to update"
+    );
   }
 
-// if user want to change role
+  // if user want to change role
   if (payload.role) {
     // If user not admin or super admin
     if (decodedToken.role === role.USER || decodedToken.role === role.GUIDE) {
@@ -106,16 +111,28 @@ const updateUser = async (
 };
 
 // Delete a user
-const deleteuser = async (userid:string)=>{
-  const deletedUser = await userModel.findByIdAndDelete(userid)
-  return deletedUser
-}
+const deleteuser = async (userid: string) => {
+  const deletedUser = await userModel.findByIdAndDelete(userid);
+  return deletedUser;
+};
 
 // Get my profile's information
-const getMe = async (id:string)=>{
+const getMe = async (id: string) => {
   const user = await userModel.findById(id).select("-password");
-  if (user === null) throw new appError(StatusCodes.NOT_FOUND, "Your profile's information not found");
-  return user;
+  // eslint-disable-next-line no-console
+  console.log(user);
+  if (user === null)
+    throw new appError(
+      StatusCodes.NOT_FOUND,
+      "Your profile's information not found"
+    );
+
+    const plainUser = user.toObject()
+
+  return {
+    ...plainUser,
+    password: "",
+  };
 };
 
 export const userServices = {
