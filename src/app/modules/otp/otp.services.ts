@@ -7,6 +7,7 @@ import appError from "../../errorHelper/appError";
 import { StatusCodes } from "http-status-codes";
 import { envVars } from "../../config/env";
 import { Resend } from "resend";
+import { otpEmailTemplate } from "./otpTemplate";
 
 
 const otpExpiration = 2 * 60; // 2 min
@@ -61,14 +62,19 @@ const otpSend = async (email: string) => {
 
     const resend = new Resend(envVars.RESEND_API_KEY as string);
 
+     const html = otpEmailTemplate({
+    name:existedUser.name,
+    otp,
+    expiry: 2,
+    appName: "Tough Tour",
+  });
+
 
  await resend.emails.send({
       from: "Tough Tours <onboarding@resend.dev>",
       to: [email],
-      subject: "Verify OTP Code",
-      html: `
-       
-      `,
+      subject: "New Message from dear Hurpori Web",
+      html,
     });
 
     if (envVars.NODE_ENV === "Development") console.log("send email of otp");
