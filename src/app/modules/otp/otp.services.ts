@@ -1,11 +1,13 @@
 /* eslint-disable no-console */
 import crypto from "crypto";
 import { redisClient } from "../../config/redis.config";
-import { sendEmail } from "../../utils/sendEmail";
 import { userModel } from "../users/user.model";
 import appError from "../../errorHelper/appError";
 import { StatusCodes } from "http-status-codes";
 import { envVars } from "../../config/env";
+import { Resend } from "resend";
+import { otpEmailTemplate } from "./otpTemplate";
+
 
 const otpExpiration = 2 * 60; // 2 min
 
@@ -47,15 +49,30 @@ const otpSend = async (email: string) => {
 
 //  sending otp to user email
   try {
-    await sendEmail({
-      to: email,
-      subject: "Verify OTP Code",
-      templateName: "otp",
-      templateData: {
-        name:existedUser.name,
-        otp,
-      },
+
+  const resend = new Resend(envVars.RESEND_API_KEY as string);
+
+   const html = otpEmailTemplate({
+    name:existedUser.name,
+    otp,
+    expiry: 2,
+    appName: "Tough Tour",
+  });
+
+
+ await resend.emails.send({
+      from: "Tough Tours <onboarding@resend.dev>",
+      to: [email],
+      subject: "One time Password - Tough Tours",
+      html,
     });
+
+    console.log({
+      email,
+      otp
+    });
+    
+
     if (envVars.NODE_ENV === "Development") console.log("send email of otp");
   } catch (error) {
     if (envVars.NODE_ENV === "Development")
