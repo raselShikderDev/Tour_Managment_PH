@@ -16,11 +16,12 @@ exports.otpServices = void 0;
 /* eslint-disable no-console */
 const crypto_1 = __importDefault(require("crypto"));
 const redis_config_1 = require("../../config/redis.config");
-const sendEmail_1 = require("../../utils/sendEmail");
 const user_model_1 = require("../users/user.model");
 const appError_1 = __importDefault(require("../../errorHelper/appError"));
 const http_status_codes_1 = require("http-status-codes");
 const env_1 = require("../../config/env");
+const resend_1 = require("resend");
+const otpTemplate_1 = require("./otpTemplate");
 const otpExpiration = 2 * 60; // 2 min
 const generateOtp = (leanth = 6) => {
     const otp = crypto_1.default.randomInt(10 ** (leanth - 1), 10 ** leanth).toString();
@@ -57,14 +58,22 @@ const otpSend = (email) => __awaiter(void 0, void 0, void 0, function* () {
     }
     //  sending otp to user email
     try {
-        yield (0, sendEmail_1.sendEmail)({
-            to: email,
-            subject: "Verify OTP Code",
-            templateName: "otp",
-            templateData: {
-                name: existedUser.name,
-                otp,
-            },
+        const resend = new resend_1.Resend(env_1.envVars.RESEND_API_KEY);
+        const html = (0, otpTemplate_1.otpEmailTemplate)({
+            name: existedUser.name,
+            otp,
+            expiry: 2,
+            appName: "Tough Tour",
+        });
+        yield resend.emails.send({
+            from: "Tough Tours <onboarding@resend.dev>",
+            to: [email],
+            subject: "One time Password - Tough Tours",
+            html,
+        });
+        console.log({
+            email,
+            otp
         });
         if (env_1.envVars.NODE_ENV === "Development")
             console.log("send email of otp");

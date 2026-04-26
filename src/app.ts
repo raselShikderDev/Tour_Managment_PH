@@ -25,9 +25,10 @@ app.use(cookieParser());
 //     },
 //   })
 // );
+const frontUrl = envVars.FRONEND_URL as string
 app.use(
   cors({
-    origin: envVars.FRONEND_URL as string,
+    origin: frontUrl,
     credentials: true,
   }),
 );

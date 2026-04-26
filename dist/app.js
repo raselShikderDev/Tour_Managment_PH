@@ -28,8 +28,9 @@ app.use((0, cookie_parser_1.default)());
 //     },
 //   })
 // );
+const frontUrl = env_1.envVars.FRONEND_URL;
 app.use((0, cors_1.default)({
-    origin: env_1.envVars.FRONEND_URL,
+    origin: frontUrl,
     credentials: true,
 }));
 app.use(passport_1.default.initialize());
