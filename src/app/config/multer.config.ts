@@ -1,23 +1,57 @@
-import multer from "multer";
+import multer, { StorageEngine } from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import { cloudinaryUpload } from "./cloudinary.config";
+import { Request } from "express";
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinaryUpload,
   params: {
-    public_id: (req, file) => {
+    public_id: (req: Request, file: Express.Multer.File) => {
       const fileName = file.originalname
         .toLowerCase()
-        .replace(/\s+/g, "-") // empty space remove replace with dash
+        .replace(/\s+/g, "-")
         .replace(/\./g, "-")
-        // eslint-disable-next-line no-useless-escape
-        .replace(/[^a-z0-9\-\.]/g, ""); // non alpha numeric - !@#$
+        .replace(/[^a-z0-9.-]/g, "");
 
-        const fileExtension = file.originalname.split(".").pop()
-        const uniqeFileName = Math.random().toString(36).substring(2) + "-" + Date.now() + "-" + fileName + "-" + "." + fileExtension
-        return uniqeFileName
+      const fileExtension = file.originalname.split(".").pop();
+
+      const uniqueFileName =
+        Math.random().toString(36).substring(2) +
+        "-" +
+        Date.now() +
+        "-" +
+        fileName +
+        "." +
+        fileExtension;
+
+      return uniqueFileName;
     },
   },
 });
 
-export const multerUpload = multer({storage:storage})
+export const multerUpload = multer({
+  storage: storage as unknown as StorageEngine,
+});
+// import multer from "multer";
+// import { CloudinaryStorage } from "multer-storage-cloudinary";
+// import { cloudinaryUpload } from "./cloudinary.config";
+
+// const storage = new CloudinaryStorage({
+//   cloudinary: cloudinaryUpload,
+//   params: {
+//     public_id: (req, file) => {
+//       const fileName = file.originalname
+//         .toLowerCase()
+//         .replace(/\s+/g, "-") // empty space remove replace with dash
+//         .replace(/\./g, "-")
+//         // eslint-disable-next-line no-useless-escape
+//         .replace(/[^a-z0-9\-\.]/g, ""); // non alpha numeric - !@#$
+
+//         const fileExtension = file.originalname.split(".").pop()
+//         const uniqeFileName = Math.random().toString(36).substring(2) + "-" + Date.now() + "-" + fileName + "-" + "." + fileExtension
+//         return uniqeFileName
+//     },
+//   },
+// });
+
+// export const multerUpload = multer({storage:storage})

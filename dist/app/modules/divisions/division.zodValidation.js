@@ -12,7 +12,7 @@ exports.createDivisionZodValidation = zod_1.default.object({
     slug: zod_1.default
         .string({ invalid_type_error: "slug must be a string" })
         .min(1, { message: "slug must be at least one character" }).optional(),
-    thumbnail: zod_1.default.string().optional(),
+    thumbnail: zod_1.default.string(),
     description: zod_1.default.string().optional(),
 });
 exports.updateDivisionZodValidation = exports.createDivisionZodValidation.partial();

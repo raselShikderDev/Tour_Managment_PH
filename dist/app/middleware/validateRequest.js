@@ -12,6 +12,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.validateRequest = void 0;
 const env_1 = require("../config/env");
 const validateRequest = (zodSchema) => (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    if (req.file) {
+        console.log("inside req.file");
+        console.log(req.file);
+    }
+    if (req.files) {
+        console.log("inside req.files");
+        console.log(req.files);
+    }
     if (env_1.envVars.NODE_ENV === "Development")
         console.log(`in validateReq - req.body: `, req.body);
     if (req.body.data) {
