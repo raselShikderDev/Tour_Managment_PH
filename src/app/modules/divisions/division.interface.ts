@@ -2,6 +2,6 @@
 export interface IDvision{
     name:string;
     slug:string;
-    thumbnail?:string;
+    thumbnail:string;
     description?:string;
 }

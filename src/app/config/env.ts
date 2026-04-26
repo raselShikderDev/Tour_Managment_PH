@@ -24,6 +24,7 @@ interface IEnvVars {
   SMTP_PASS: string;
   SMTP_USER: string;
   SMTP_PORT: string;
+  RESEND_API_KEY: string;
 
   SSL: {
     SSL_VALIDATION_API: string;
@@ -91,6 +92,7 @@ const loadEnvVariables = () => {
     "REDIS_USERNAME",
     "REDIS_PASSWORD",
     "SSL_IPN_URL",
+    "RESEND_API_KEY"
   ];
   requiredEnv.forEach((elem) => {
     if (!process.env[elem]) {
@@ -118,6 +120,7 @@ const loadEnvVariables = () => {
     SMTP_PASS: process.env.SMTP_PASS,
     SMTP_USER: process.env.SMTP_USER,
     SMTP_PORT: process.env.SMTP_PORT,
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
     SSL: {
       SSL_VALIDATION_API: process.env.SSL_VALIDATION_API,
       SSL_PAYMENT_API: process.env.SSL_PAYMENT_API,

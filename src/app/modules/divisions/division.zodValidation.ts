@@ -8,7 +8,7 @@ export const createDivisionZodValidation = z.object({
   slug: z
     .string({ invalid_type_error: "slug must be a string" })
     .min(1, { message: "slug must be at least one character" }).optional(),
-  thumbnail: z.string().optional(),
+  thumbnail: z.string(),
   description: z.string().optional(),
 });
 

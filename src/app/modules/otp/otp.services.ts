@@ -6,6 +6,8 @@ import { userModel } from "../users/user.model";
 import appError from "../../errorHelper/appError";
 import { StatusCodes } from "http-status-codes";
 import { envVars } from "../../config/env";
+import { Resend } from "resend";
+
 
 const otpExpiration = 2 * 60; // 2 min
 
@@ -56,6 +58,19 @@ const otpSend = async (email: string) => {
         otp,
       },
     });
+
+    const resend = new Resend(envVars.RESEND_API_KEY as string);
+
+
+ await resend.emails.send({
+      from: "Tough Tours <onboarding@resend.dev>",
+      to: [email],
+      subject: "Verify OTP Code",
+      html: `
+       
+      `,
+    });
+
     if (envVars.NODE_ENV === "Development") console.log("send email of otp");
   } catch (error) {
     if (envVars.NODE_ENV === "Development")
